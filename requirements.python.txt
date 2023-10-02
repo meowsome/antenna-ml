@@ -2,3 +2,4 @@ pandas
 shap
 scikit-learn
 numpy
+ipywidgets
