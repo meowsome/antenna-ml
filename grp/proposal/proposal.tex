@@ -1,0 +1,127 @@
+\documentclass[12pt, letterpaper, notitlepage]{article}
+\usepackage[margin=1in]{geometry}  % Custom margins
+\usepackage{tabularx}  % Author block table magic
+\usepackage{hyperref}  % Link and mailto support
+\usepackage{lipsum}  % LOREM IPSUM DUMMY TEXT. REMOVE.
+\pagenumbering{gobble}
+
+% Overwrite abstract environment
+  \renewenvironment{abstract}{%
+      \if@twocolumn
+        \section*{\abstractname}%
+      \else
+        \small
+        \paragraph{\abstractname:}
+      \fi}
+      {\if@twocolumn\else\par\bigskip\fi}
+
+\begin{document}
+
+% Begin title region.
+\begin{center}
+% Department/Institution
+\textbf{\noindent\large Embry-Riddle Aeronautical University\\
+Department of Electrical Engineering and Computer Science}
+
+% Subtitle
+\vspace{0.5em}  % Change spacing between title and subtitle
+\uppercase{GRADUATE PROJECT PROPOSAL}
+
+% Actual Title
+\vspace{1em}
+\emph{An Explainable Machine Learning Approach to Antenna Design}
+
+% Version and editing date.
+\vspace{1.5em}
+\emph{
+\begin{tabularx}{0.5\linewidth}{
+    >{\centering\arraybackslash}X
+    >{\centering\arraybackslash}X
+    }
+    Version: 0.0.1 &
+    Date: 10/08/2023  % Consider \today
+\end{tabularx}
+}
+
+% Author block. Bgroup and arraystretch fix vertical spacing issues.
+% Ignore weird "terminate with space" warnings.
+\bgroup
+\def\arraystretch{1.5}
+\vspace{1.5em}
+\emph{
+\begin{tabularx}{\textwidth}{
+    >{\raggedright\arraybackslash}X
+    >{\centering\arraybackslash}X
+    >{\raggedleft\arraybackslash}X
+    }
+    Course Number: SE690 & Credit Hours: 3 & Semester: Spring 2024 \\
+    Author: Tyler Carr & Student ID:\ 2498305 & Student Program: MSSE \\
+\end{tabularx}}
+\egroup
+
+% Email and mailto link
+\vspace{1em}
+\emph{Student email: \href{mailto:carrt12@my.erau.edu}{carrt12@my.erau.edu}}
+
+\end{center}
+
+\vspace*{\fill}
+
+% Abstract
+\abstract{\lipsum[1-2]}
+
+\newpage
+
+\bgroup
+\footnotesize
+\def\arraystretch{1.5}
+\noindent\begin{tabularx}{\textwidth}{|X|X|X|X|} \hline
+    & \textbf{Name} & \textbf{Signature} & \textbf{Date} \\ \hline \hline
+    \textbf{Student} & Tyler Carr & & \today \\ \hline
+    \textbf{GRP Advisor} & Dr.\ Eduardo Rojas & & \today \\ \hline
+    \textbf{Program Coordinator / Department Chair} & Dr.\ Masood Towhidnejad & & \today \\ \hline
+\end{tabularx}
+\egroup
+
+\newpage
+\noindent\begin{tabularx}{\textwidth}{|X|X|X|} \hline
+    \textbf{Date} & \textbf{Version} & \textbf{Description} \\ \hline \hline
+    \today & 0.0.1 & Initial commit, TeX Formatting\\ \hline
+\end{tabularx}
+
+
+\section*{Objective}
+The goal of the project is to develop an explainable machine learning model that defines the most ideal dimensions for an antenna geometry when given specifications such as performance and dimension constraints. 
+
+
+\section*{Problem}
+Currently, simulations are performed for a variety of antenna. Depending on the type of antenna and other factors, simulations can take a long time to run. Other factors can include any interruptions to the simulation, such as power and internet outages. If a simulation is interrupted, the progress is not saved. The simulation has to be manually started again.\\
+An example of a simulation whose data was provided to me was a simulation of an antenna with 6 varying dimensions. The results provided information such as reflection coefficient and gain. The data included 4222*304262=1,284,594,164 individual rows of data. The simulation was started on a Monday, was interrupted by a power outage in the middle of the week, and the results were finally produced on Friday of that same week. \\
+
+
+\section*{Approach}
+In order to significantly reduce the amount of time it takes to get results from simulations, a machine learning algorithm will be implemented. Once trained, this model will be able to predict what the performance is for any combination of geometric inputs to an antenna design with a particular accuracy. This prediction can be made provided that the model has already seen sufficient training data that has already been created with the simulator~\cite{Naseri_2021}.\\
+Geometric parameters are tested within a desired range with a specified increment. These parameters are entered into the Ansys HFSS Simulator, which outputs the dB(S(1,1)), which is the reflection coefficient representing power reflected from the antenna and is ideally below -10 dB~\cite{Bevelacqua_2015} and gain. These results are saved in the form of a CSV (comma-separated value) spreadsheet.\\
+This data is then imported into Python as a Pandas Dataframe~\cite{reback2020pandas}. The data is preprocessed with a Sklearn (Scikit-Learn) preprocessor~\cite{scikit-learn}. This includes scaling the data, which scales each feature to a specified range, as well as removing any data rows that contain invalid data, such as a positive reflection coefficient value.\\
+After the preprocessing is complete, Sklearn's GridSearchCV is used to find the optimal parameters for the Decision Tree Regressor model that is being used.\\
+SHAP (Shapley Additive Explanations) is then applied to the trained machine learning model~\cite{lundberg2017unified}. This is used to determine which geometric parameters have the highest impact on the predictions of the model. If a certain parameter has a significantly higher impact than the others, it will be given higher preference when choosing the parameters for the creation of an antenna with that particular set of parameters.\\
+The end goal will be creating a program that can take reflection coefficient, gain, and geometric constraints as inputs and determine the best geometry for an antenna for those inputs. 
+
+\section*{Deliverables and Timeline}
+
+\centering
+Table: Project deliverables and timeline\\
+\noindent\begin{tabularx}{\textwidth}{|X|X|X|} \hline
+  \textbf{\#} & \textbf{Deliverables} & \textbf{Date} \\ \hline \hline
+  1 & Problem Description & 2/10/2024\\ \hline
+  2 & Completed machine learning model & 3/22/2024\\ \hline
+  3 & GUI to choose antenna parameters based on desired performance & 4/12/2024\\ \hline
+  4 & GRP Report & 4/26/2024\\ \hline
+  5 & GRP Presentation & 5/1/2024\\ \hline
+\end{tabularx}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+
+\end{document}
