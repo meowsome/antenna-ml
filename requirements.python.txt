@@ -3,3 +3,4 @@ shap
 scikit-learn
 numpy
 ipywidgets
+matplotlib
