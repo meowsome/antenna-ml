@@ -17,3 +17,6 @@ grp/proposal/*.synctex.gz
 grp/proposal/*.fdb_latexmk
 grp/proposal/*.bbl
 grp/proposal/*.blg
+*.tsv
+*.tfevents
+catboost*
