@@ -1,0 +1,56 @@
+\documentclass[11pt, notitlepage]{article}
+\usepackage[margin=1in]{geometry}  % Custom margins
+\usepackage{tabularx}  % Author block table magic
+\usepackage{multicol}
+\usepackage[table]{xcolor}\usepackage{titlesec}
+
+% Set space between columns
+\setlength\columnsep{25pt}
+
+% Set section titles
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+
+% Hide page numbers
+\pagenumbering{gobble}
+
+
+% Begin title region.
+\title{\textbf{An Explainable Machine Learning Approach to Antenna Design}}
+\author{Tyler Carr \\ carrt12@my.erau.edu \\ Embry-Riddle Aeronautical University \\ Daytona Beach, FL}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\begin{multicols}{2}
+
+\section*{Abstract}
+Antenna design process require extensive simulations tasks that are resource and time intensive, and are prone to interruptions. Furthermore, design equations are only available for predefined limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance. 
+
+\section{Introduction}
+Blah
+
+\section{Related Work}
+Blah
+
+\section{Methodology}
+Blah
+
+\section{Approach}
+Blah
+
+\section{Discussion}
+Blah
+
+\section{Conclusion}
+Blah
+
+\bibliographystyle{unsrt}
+\bibliography{refs}
+
+\end{multicols}
+
+
+\end{document}
