@@ -47,13 +47,14 @@ The input to the simulation is a table that consists of every permutation of the
 
 
 \subsection{Simulation Issues}
-The main issue with running simulations in HFSS is the amount of time that it takes. TODO FINISH ME
+The main issue with running simulations in HFSS is the amount of time that it takes. The matrix operations that are required to run many iterations of simulations to analyze loss can take multiple days to complete~\cite{john_antenna_2009}. Depending on how the simulation is set up, this process could be impacted by power outages or software bugs, resulting in a loss of data and requiring manual intervention to re-run the simulation. 
 
-
-\subsection{Reversing the Problem}
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
-A machine learning algorithm was employed to automate the process of finding the optimal antenna geometry. After training a machine learning model on the permutation data, predictions can be searched by specifying the S11 value of the desired performance and a range of frequency values. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations.  
+By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run can be significantly reduced. The algorithm can then be used to fill in the missing gaps between the reduced data with estimates, making it easier to narrow down to a specific area of interest. 
+
+\subsection{Reversing the Problem}
+After training a machine learning model on the permutation data, predictions can be searched by specifying the S11 value of the desired performance and a range of frequency values. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations.  
 
 
 \section{Related Work}
