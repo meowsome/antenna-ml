@@ -1,42 +1,30 @@
-\documentclass[11pt, notitlepage]{article}
-\usepackage[margin=1in]{geometry}  % Custom margins
-\usepackage{tabularx}  % Author block table magic
-\usepackage{multicol}
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
 \usepackage{graphicx}
-\usepackage[table]{xcolor}\usepackage{titlesec}
-
-% Set space between columns
-\setlength\columnsep{25pt}
-
-% Set section titles
-\setcounter{tocdepth}{5}
-\setcounter{secnumdepth}{5}
-
-% Create figure counter and command to increment and show at the same time
-\newcounter{figure_counter}
-\newcommand\figuretitle{\addtocounter{figure_counter}{1}Figure \arabic{figure_counter}: }
-
-% Hide page numbers
-\pagenumbering{gobble}
+\usepackage{cite}
 
 % Set path for images
 \graphicspath{ {./images/} }
 
-
-% Begin title region.
-\title{\textbf{An Explainable Machine Learning Approach to Antenna Design}}
-\author{Tyler Carr \\ carrt12@my.erau.edu \\ Embry-Riddle Aeronautical University \\ Daytona Beach, FL}
-\date{}
-
 \begin{document}
+
+\title{An Explainable Machine Learning Approach to Antenna Design}
+
+\author{Tyler Carr \\ carrt12@my.erau.edu \\ Embry-Riddle Aeronautical University \\ Daytona Beach, FL}
+
 \maketitle
 
-
-\begin{multicols}{2}
-
-\section*{Abstract}
+\begin{abstract}
 Antenna design process require extensive simulations tasks that are resource and time intensive, and are prone to interruptions. Furthermore, design equations are only available for predefined limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance. 
-
+\end{abstract}
 
 \section{Introduction}
 Antenna designs require simulation in order to determine the performance of the antenna. Ansys High Frequency Simulation Software (HFSS) is an electromagnetic simulation software which is used to design and simulate the frequency of antennas. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run.
@@ -55,7 +43,6 @@ By using a machine learning algorithm to do the bulk of the investigative work, 
 
 \subsection{Reversing the Problem}
 After training a machine learning model on the permutation data, predictions can be searched by specifying the S11 value of the desired performance and a range of frequency values. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations.  
-
 
 \section{Related Work}
 TODO FINISH ME
@@ -76,31 +63,22 @@ TODO  FINISH ME:
 
 - Previously, small increments of data would have to be simulated and manually inspected for performance, which takes a lot of time to perform. Training the machine learning model on data with larger increments allows for a shorter simulation time, since the model will fill in the gaps with predictions. It also aids in providing a better guess of an optimal algorithm for a particular performance, helping optimize the antenna faster. 
 
-\begin{center}
-  \includegraphics[width=.5\textwidth]{methodology}
-  \figuretitle Flow of data through the system
-\end{center}
-
+\begin{figure*}[!t]
+\centering
+\subfloat[]{\includegraphics[width=2.5in]{methodology}%
+\label{fig_second_case}}
+\caption{Flow of data through the system}
+\label{fig_sim}
+\end{figure*}
+    
 - Insert graph of accuracy here 
 
 
-\section{Approach}
-Blah
 
-
-\section{Discussion}
-Blah
-
-
-\section{Conclusion}
-Blah
-
-
-\bibliographystyle{unsrt}
+\bibliographystyle{IEEEtran}
 \bibliography{refs}
 
 
-\end{multicols}
-
+\vfill
 
 \end{document}
