@@ -4,3 +4,4 @@ scikit-learn
 numpy
 ipywidgets
 matplotlib
+nbformat>=4.2.0
