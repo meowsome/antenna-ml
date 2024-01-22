@@ -30,8 +30,8 @@ Antenna design process require extensive simulations tasks that are resource and
 Antenna designs require simulation in order to determine the performance of the antenna. Ansys High Frequency Simulation Software (HFSS) is an electromagnetic simulation software which is used to design and simulate the frequency of antennas. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run.
 
 
-\subsection{Input Data}
-The input to the simulation is a table that consists of every permutation of the varying values of each dimension, with each dimension having a set range and a certain value that it is incrementing by. This is also associated with a frequency value. Each permutation is associated with a particular S11 value. S11 value are used as a measure of performance. An S11 value, also known as the reflection coefficient, represents the amount of power reflected from the antenna. An example of an S11 value is 0dB, which would mean that all of the power is being reflected from the antenna, meaning that there is no radiation. Ideally, this value should be below -10dB~\cite{Bevelacqua_2015}. 
+\subsection{Dataset}
+The input to the simulation is a table that consists of every combination of the varying values of each dimension, with each dimension having a set range and a certain value that it is incrementing by. This is also associated with a frequency value. Each combination is associated with a particular S11 value. S11 value are used as a measure of performance. An S11 value, also known as the reflection coefficient, represents the amount of power reflected from the antenna. An example of an S11 value is 0dB, which would mean that all of the power is being reflected from the antenna, meaning that there is no radiation. Ideally, this value should be below -10dB~\cite{Bevelacqua_2015}.
 
 
 \subsection{Simulation Issues}
@@ -39,39 +39,69 @@ The main issue with running simulations in HFSS is the amount of time that it ta
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
-By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run can be significantly reduced. The algorithm can then be used to fill in the missing gaps between the reduced data with estimates, making it easier to narrow down to a specific area of interest. 
+By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. The algorithm can then be used to fill in the missing gaps between the reduced data with estimates, making it easier to narrow down to a specific area of interest. 
 
 \subsection{Reversing the Problem}
-After training a machine learning model on the permutation data, predictions can be searched by specifying the S11 value of the desired performance and a range of frequency values. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations.  
+After training a machine learning model on the dataset, a table is produced with significantly more rows than was started with from the simulated data. Predictions can be searched by specifying the desired S11 value and a range of frequency values that the antenna should operate between. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations. When seeking an optimal geometry between a certain frequency range, the geometry that results in the S11 with the lowest maximum S11 range would be chosen.
 
 \section{Related Work}
-TODO FINISH ME
+Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11. For rows of data, algorithms that have been used before can be something like a Artificial Neural Networks, Gaussian Network, or Gaussian Process Regression. The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for Convolutional Neural Networks and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions.~\cite{wu_machine_2023} 
 
 
 \section{Methodology}
-In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained on the input data, which is the table where each row represents a permutation of geometry dimensions, frequency, and associated S11 value. The X values are the features, which are the geometry dimensions and frequency. The y values are the targets, or the dependent variables. These are the S11 values. After the algorithm is trained, the 
+In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained on a preexisting dataset, which came from a parametric sweep performed in HFSS on the simulated antenna design. In this input data, each row represents a combination of geometry dimensions, frequency, and an associated S11 value. The features, or independent variables, of this problem are the geometry dimensions and frequency. The targets, or dependent variables, are the S11 values. 
+
+Previously, small increments of data would have to be simulated by the parametric sweep and manually inspected for performance, which takes a lot of time to perform. Training the machine learning model on data with larger increments allows for a shorter simulation time, since the model will fill in the gaps with predictions. It also aids in providing a better guess of an optimal algorithm for a particular performance, helping optimize the antenna faster. 
+
+For the development of the algorithm, a Grounded CPW Leaky Wave Antenna was used. This is a new antenna design being developed by a student that needed optimization.
+
+\subsection{Choosing an Algorithm}
+In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value down to multiple decimal points of precision is very unlikely, so this tolerance allows allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
+
+A regression algorithm was chosen as the target is numeric. 25\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 75\% was used to train the models. Two common metrics to compare algorithm performance are to use the R-square score~\eqref{eq:rsquared} and the Mean Squared Error (MSE)~\eqref{eq:mse} when comparing the simulated and predicted S11 values~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
+
+\begin{figure}
+    \begin{equation}
+        R^2 = 1 - \frac{\text{SSR}}{\text{SST}}
+        \label{eq:rsquared}
+    \end{equation}
+    \begin{equation}
+        {MSE} = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y}_i)^2
+        \label{eq:mse}
+    \end{equation}
+    \caption{Formulas for R-squared and Mean Squared Error (MSE)}
+\end{figure}
+
+
+TODO ADD MORE ABOUT RESULTS OF RSQUARED AND MSE  
+
+\subsection{Preprocessing}
+Data points with S11 values that are greater than zero are ignored. This should never happen in a real scenario, and if this occurs, it means that there was an error with the calculation. 
+
+TODO ADD MORE
+
+\subsection{Training}
 
 TODO INSERT WHAT TYPE OF ALGORITHM USED AND WHY
 
-TODO  FINISH ME:
+\subsection{Finding Optimal Geometry}
 
-- For the development of the algorithm, a Grounded CPW Leaky Wave Antenna was used. This is a new antenna design that was in development by a student which needed refinement.
 
-- Data points with S11 values that are greater than zero are ignored. This should never happen in a real scenario, and means an error occurred with the calculation.
-
-- In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value down to multiple decimal points of precision is very unlikely, so this tolerance allows allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range above or below the true value. The tolerance is important for an accurate model, and ideally this value should be less than or equal to one.
-
-- Previously, small increments of data would have to be simulated and manually inspected for performance, which takes a lot of time to perform. Training the machine learning model on data with larger increments allows for a shorter simulation time, since the model will fill in the gaps with predictions. It also aids in providing a better guess of an optimal algorithm for a particular performance, helping optimize the antenna faster. 
 
 \begin{figure*}[!t]
 \centering
-\subfloat[]{\includegraphics[width=2.5in]{methodology}%
-\label{fig_second_case}}
+\includegraphics[width=2.5in]{methodology}
 \caption{Flow of data through the system}
 \label{fig_sim}
 \end{figure*}
     
 - Insert graph of accuracy here 
+
+
+\section{Results}
+
+
+\section{Conclusion}
 
 
 
