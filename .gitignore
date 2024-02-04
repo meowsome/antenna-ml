@@ -19,3 +19,5 @@ grp/*/*.blg
 *.tsv
 *.tfevents
 catboost*
+research/untitled_project/*
+*.h5
