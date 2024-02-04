@@ -21,3 +21,5 @@ grp/*/*.blg
 catboost*
 research/untitled_project/*
 *.h5
+*.pkl
+*.png
