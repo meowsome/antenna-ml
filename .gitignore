@@ -22,4 +22,4 @@ catboost*
 research/untitled_project/*
 *.h5
 *.pkl
-*.png
+research/*.png
