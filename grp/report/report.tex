@@ -49,16 +49,16 @@ Machine learning topics with antenna design optimizations have been explored bef
 
 
 \section{Methodology}
-In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained on a preexisting dataset, which came from a parametric sweep performed in HFSS on the simulated antenna design. In this input data, each row represents a combination of geometry dimensions, frequency, and an associated S11 value. The features, or independent variables, of this problem are the geometry dimensions and frequency. The targets, or dependent variables, are the S11 values. 
+In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method on a preexisting dataset. This dataset came from a parametric sweep performed in HFSS on the simulated antenna design. In this input data, each row represents a combination of geometry dimensions, frequency, and an associated S11 value. The features, or independent variables, of this problem are the geometry dimensions and frequency. The targets, or dependent variables, are the S11 values. 
 
 Previously, small increments of data would have to be simulated by the parametric sweep and manually inspected for performance, which takes a lot of time to perform. Training the machine learning model on data with larger increments allows for a shorter simulation time, since the model will fill in the gaps with predictions. It also aids in providing a better guess of an optimal algorithm for a particular performance, helping optimize the antenna faster. 
 
 For the development of the algorithm, a Grounded CPW Leaky Wave Antenna was used. This is a new antenna design being developed by a student that needed optimization.
 
-\subsection{Choosing an Algorithm}
+\subsection{Analyzing the Data}
 In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value down to multiple decimal points of precision is very unlikely, so this tolerance allows allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
 
-A regression algorithm was chosen as the target is numeric. 25\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 75\% was used to train the models. Two common metrics to compare algorithm performance are to use the R-square score~\eqref{eq:rsquared} and the Mean Squared Error (MSE)~\eqref{eq:mse} when comparing the simulated and predicted S11 values~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
+A regression algorithm was chosen as the target is numeric. 20\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 80\% was used to train the models. Two common metrics to compare algorithm performance are to use the R-square score~\eqref{eq:rsquared} and the RMSE (Root Mean Squared Error)~\eqref{eq:rmse} when comparing the simulated and predicted S11 values~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
 
 \begin{figure}
     \begin{equation}
@@ -66,26 +66,35 @@ A regression algorithm was chosen as the target is numeric. 25\% of the dataset 
         \label{eq:rsquared}
     \end{equation}
     \begin{equation}
-        {MSE} = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y}_i)^2
-        \label{eq:mse}
+        {RMSE} = \sqrt(\frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y}_i)^2)
+        \label{eq:rmse}
     \end{equation}
-    \caption{Formulas for R-squared and Mean Squared Error (MSE)}
+    \caption{Formulas for R-squared and RMSE}
 \end{figure}
 
 
-TODO ADD MORE ABOUT RESULTS OF RSQUARED AND MSE  
 
 \subsection{Preprocessing}
-Data points with S11 values that are greater than zero are ignored. This should never happen in a real scenario, and if this occurs, it means that there was an error with the calculation. 
+Preprocessing is a necessary step with any data being processed through a machine learning algorithm. Only after the data is preprocessed will it yield beneficial results from the algorithm. 
 
-TODO ADD MORE
+The first step was to exclude any data that was considered invalid. Data points with S11 values that are greater than zero are ignored. This should never happen in a real scenario, and if this occurs, it means that there was an error with the calculation. 
 
-\subsection{Training}
+The next preprocessing action that was performed was scaling. This process linearly transforms the ranges of the geometry parameters to have the same scale. This is performed so all features are weighted the same and no one feature is artificially weighted more than the others. 
 
-TODO INSERT WHAT TYPE OF ALGORITHM USED AND WHY
+\subsection{TensorFlow}
+TensorFlow was used to create a deep neural network with multiple layers in order to make predictions of the S11 value.
+
+The hyperparameters were tuned in an attempt to both improve the accuracy and reduce the error rate of the model. This was done by adjusting various hyperparameters of the model, including the number of layers in the network, the rate at which the model learns, andw the unit of each layer, which represents the number of neurons and outputs. This was done using a randomized searching method. In typical grid search hyperparameter tuning, the search space grows too large to be feasibly tested fairly quickly. With the randomized search method, a random subset of hyperparameter combinations can be tested. The most optimal results are not guaranteed, but it can get relatively close~\cite{omalley2019kerastuner}. 
+
+TODO write about gpu and cpu, what metrics were used, what graphs were generated 
+
+\subsection{Scikit-learn}
+
+
+TODO write about all models tested, how the preprocessing was the same insert graphs and talk about them 
 
 \subsection{Finding Optimal Geometry}
-
+TODO write about methods used comparing sklaern, tensorflow
 
 
 \begin{figure*}[!t]
