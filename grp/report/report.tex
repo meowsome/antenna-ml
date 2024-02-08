@@ -10,9 +10,16 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{cite}
+\usepackage[hypcap=false]{caption}
+\usepackage{float}
 
 % Set path for images
 \graphicspath{ {./images/} }
+
+\newenvironment{Figure}
+    {\par\medskip\noindent\minipage{\linewidth}}
+    {\endminipage\par\medskip}
+
 
 \begin{document}
 
@@ -97,25 +104,25 @@ TODO write about all models tested, how the preprocessing was the same insert gr
 TODO write about methods used comparing sklaern, tensorflow
 
 
-\begin{figure*}[!t]
+\begin{Figure}
 \centering
-\includegraphics[width=2.5in]{methodology}
-\caption{Flow of data through the system}
-\label{fig_sim}
-\end{figure*}
+\includegraphics[width=3.0in]{methodology}
+\captionof{figure}{Flow of data through the system}
+\label{data_flow}
+\end{Figure}
 
 
 \section{Results}
-All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
+All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9\-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
 
 \subsection{Library and Model Comparison with Leaky Wave Antenna}
 The Leaky Wave Antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN (deep neural network) provided the results in the following table. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1 with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
+The Keras Tuner search for optimal hyperparameters of the DNN (deep neural network) provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1 with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
 
-Figure 3 shows how the DNN's loss decreased as the number of epochs increased. The fact that this graph shows both the training and testing decreasing shows that the model is converging. Additionally, the model is not overfitting. 
+Figure \ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of epochs increased. The fact that this graph shows both the training and testing decreasing shows that the model is converging. Additionally, the model is not overfitting. 
 
-\begin{table}
+\begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
 \begin{center}
 \begin{tabular}{ |c|c|c| }
@@ -136,14 +143,15 @@ Figure 3 shows how the DNN's loss decreased as the number of epochs increased. T
     \hline
 \end{tabular}
 \end{center}
+\label{keras_best_params}
 \end{table}
 
-\begin{figure*}[!t]
+\begin{Figure}
     \centering
     \includegraphics[width=2.5in]{loss}
-    \caption{DNN Loss Graph}
-    \label{fig_sim}
-    \end{figure*}
+    \captionof{figure}{DNN Loss Graph}
+    \label{dnn_loss_graph}
+\end{Figure}
 
 TODO insert tensorflow epoch vs accuracy +- 1 graph? 
 
@@ -151,9 +159,9 @@ TODO insert data about sklearn
 
 When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. 
 
-It's clear from the comparison table that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1. It trains and predicts significantly faster, and it has a lower RMSE.
+It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1. It trains and predicts significantly faster, and it has a lower RMSE.
 
-\begin{table}
+\begin{table}[h]
 \caption{Comparing Libraries}
 \begin{center}
 \begin{tabular}{ |c|c|c| }
@@ -170,24 +178,25 @@ It's clear from the comparison table that Scikit-learn is the best choice of lib
     \hline
 \end{tabular}
 \end{center}
+\label{comparing_libraries}
 \end{table}
 
 TODO EXPLAIN BOTH THESE GRAPHS
 Both show how sklearn is better for this problem
 
-\begin{figure*}[!t]
+\begin{Figure}
     \centering
     \includegraphics[width=2.5in]{histogram}
-    \caption{Histogram of Error}
-    \label{fig_sim}
-    \end{figure*}
+    \captionof{figure}{Histogram of Error}
+    \label{historgram_of_error}
+\end{Figure}
 
-\begin{figure*}[!t]
+\begin{Figure}
     \centering
     \includegraphics[width=2.5in]{actual_vs_predicted_s11}
-    \caption{Actual vs Predicted S11}
-    \label{fig_sim}
-    \end{figure*}
+    \captionof{figure}{Actual vs Predicted S11}
+    \label{actual_vs_predicted_s11}
+\end{Figure}
 
 \subsection{Testing with Completely Unseen Data}
 The chosen model was given a set of 3 geometries that had never been seen before by either the training set or testing set. They 
