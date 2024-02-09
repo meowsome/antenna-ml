@@ -34,11 +34,11 @@ Antenna design process require extensive simulations tasks that are resource and
 \end{abstract}
 
 \section{Introduction}
-Antenna designs require simulation in order to determine the performance of the antenna. Ansys High Frequency Simulation Software (HFSS) is an electromagnetic simulation software which is used to design and simulate the frequency of antennas. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run.
+Antenna designs require simulation in order to determine the performance of the antenna. Ansys High Frequency Simulation Software (HFSS) is an electromagnetic simulation software which is used to design and simulate antennas between a range of frequencies. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run. These simulations produce S11 values, which are the reflection coefficients. These represent the amount of power that is reflected from the antenna, and is measured in decibels. This value is always negative, and a lower value means the antenna is performing more efficiently. Ideally, this value is below -10dB~\cite{Bevelacqua_2015}.
 
 
 \subsection{Dataset}
-The input to the simulation is a table that consists of every combination of the varying values of each dimension, with each dimension having a set range and a certain value that it is incrementing by. This is also associated with a frequency value. Each combination is associated with a particular S11 value. S11 value are used as a measure of performance. An S11 value, also known as the reflection coefficient, represents the amount of power reflected from the antenna. An example of an S11 value is 0dB, which would mean that all of the power is being reflected from the antenna, meaning that there is no radiation. Ideally, this value should be below -10dB~\cite{Bevelacqua_2015}.
+The dataset that was used to train and test the machine learning models was generated from a parametric sweep of a Leaky Wave Antenna. The seven features of the dataset include Feed Gap (mm), Feed Inset (cm), Feed Width (cm), Ground Gap (mm), Pad Length (cm), Pad Width (cm), and Frequency (GHz). All of the features except the frequency represent a part of the antenna's geometry. Each of the features were paired with a label, which is a S11 value. 
 
 
 \subsection{Simulation Issues}
@@ -46,28 +46,28 @@ The main issue with running simulations in HFSS is the amount of time that it ta
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
-By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. The algorithm can then be used to fill in the missing gaps between the reduced data with estimates, making it easier to narrow down to a specific area of interest. 
+By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 21 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated and new S11 values can be predicted. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
+
 
 \subsection{Reversing the Problem}
 After training a machine learning model on the dataset, a table is produced with significantly more rows than was started with from the simulated data. Predictions can be searched by specifying the desired S11 value and a range of frequency values that the antenna should operate between. Antenna geometries that match the search are returned, which saves significant time that would be required to set up and perform additional simulations. When seeking an optimal geometry between a certain frequency range, the geometry that results in the S11 with the lowest maximum S11 range would be chosen.
 
+
 \section{Related Work}
 Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11. For rows of data, algorithms that have been used before can be something like a Artificial Neural Networks, Gaussian Network, or Gaussian Process Regression. The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for Convolutional Neural Networks and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions.~\cite{wu_machine_2023} 
 
+TODO ADD MORE 
+
 
 \section{Methodology}
-In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method on a preexisting dataset. This dataset came from a parametric sweep performed in HFSS on the simulated antenna design. In this input data, each row represents a combination of geometry dimensions, frequency, and an associated S11 value. The features, or independent variables, of this problem are the geometry dimensions and frequency. The targets, or dependent variables, are the S11 values. 
-
-Previously, small increments of data would have to be simulated by the parametric sweep and manually inspected for performance, which takes a lot of time to perform. Training the machine learning model on data with larger increments allows for a shorter simulation time, since the model will fill in the gaps with predictions. It also aids in providing a better guess of an optimal algorithm for a particular performance, helping optimize the antenna faster. 
-
-For the development of the algorithm, a Grounded CPW Leaky Wave Antenna was used. This is a new antenna design being developed by a student that needed optimization.
+In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method using the parametric sweep dataset for the antenna geometry. Because the data is generated from a parametric sweep, it contains many different combinations of geometries. Out of the 4,221 rows, there were 21 unique geometries that each had a simulated S11 value for the same frequency range between 2 to 20. Generating all the permutations of geometries and frequencies added up to a total of 555 unique geometries, which includes the original 21. The real S11 values are used for the original 21, but predictions are generated for the rest of the geometry and frequency combinations. This new dataset includes a total of 111,555 rows. These values aid in providing a better guess of an optimal geometry for a specfiied S11 and frequency range, helping optimize the antenna faster. 
 
 \subsection{Analyzing the Data}
-In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value down to multiple decimal points of precision is very unlikely, so this tolerance allows allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
+In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value with high precision is very unlikely, so this tolerance allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range specified by the tolerance either above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
 
-A regression algorithm was chosen as the target is numeric. 20\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 80\% was used to train the models. Two common metrics to compare algorithm performance are to use the R-square score~\eqref{eq:rsquared} and the RMSE (Root Mean Squared Error)~\eqref{eq:rmse} when comparing the simulated and predicted S11 values~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
+A regression algorithm was chosen as the label is numeric. 20\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 80\% was used to train the models. Two common metrics to compare algorithm performance in addition to the tolerance mentioned above are the $R^2$ score~\eqref{eq:rsquared} and the RMSE (Root Mean Squared Error)~\eqref{eq:rmse}~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
 
-\begin{figure}
+\begin{figure}[h]
     \begin{equation}
         R^2 = 1 - \frac{\text{SSR}}{\text{SST}}
         \label{eq:rsquared}
@@ -80,23 +80,30 @@ A regression algorithm was chosen as the target is numeric. 20\% of the dataset 
 \end{figure}
 
 
-
 \subsection{Preprocessing}
-Preprocessing is a necessary step with any data being processed through a machine learning algorithm. Only after the data is preprocessed will it yield beneficial results from the algorithm. 
+Preprocessing is a necessary step with any data being processed through a machine learning algorithm. Only after the data is preprocessed will it yield beneficial results from the algorithm.
 
 The first step was to exclude any data that was considered invalid. Data points with S11 values that are greater than zero are ignored. This should never happen in a real scenario, and if this occurs, it means that there was an error with the calculation. 
 
-The next preprocessing action that was performed was scaling. This process linearly transforms the ranges of the geometry parameters to have the same scale. This is performed so all features are weighted the same and no one feature is artificially weighted more than the others. 
+The next preprocessing action that was performed was scaling. This process linearly transforms the ranges of the geometry parameters to have the same scale. This is performed so all features are weighted the same and no one feature is artificially weighted more than the others.
+
+
+\subsection{Comparing Models}
+Two different libraries were compared in order to determine the best model for this type of dataset. The first library that was used is TensorFlow, which was used to create a DNN (deep neural network). The performance of the DNN was compared to many of Scikit-learn's regression models.
+
+To keep the comparison between the algorithms fair, all preprocessing steps were performed in the same way when comparing the performance of different libraries and algorithms. When splitting the dataset into training and testing portions, the dataset was split with the same random state, meaning that every model received the same random subset of data for training. Additionally, the models were evaluated in the same way using the same performance metrics between the different libraries. All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9\-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
+
 
 \subsection{TensorFlow}
-TensorFlow was used to create a deep neural network with multiple layers in order to make predictions of the S11 value.
+TensorFlow was used to create a DNN (deep neural network), which is useful for large datasets. The main benefit of a DNN is that it automatically figures out the most important correlations between features for you. 
 
-The hyperparameters were tuned in an attempt to both improve the accuracy and reduce the error rate of the model. This was done by adjusting various hyperparameters of the model, including the number of layers in the network, the rate at which the model learns, andw the unit of each layer, which represents the number of neurons and outputs. This was done using a randomized searching method. In typical grid search hyperparameter tuning, the search space grows too large to be feasibly tested fairly quickly. With the randomized search method, a random subset of hyperparameter combinations can be tested. The most optimal results are not guaranteed, but it can get relatively close~\cite{omalley2019kerastuner}. 
+The hyperparameters of the DNN were tuned in an attempt to both improve the accuracy and reduce the error rate of the model. This was done by adjusting various hyperparameters of the model, including the number of layers in the network, the rate at which the model learns, andw the unit of each layer, which represents the number of neurons and outputs. This was done using a randomized searching method. In typical grid search hyperparameter tuning, the search space grows too large to be feasibly tested fairly quickly. With the randomized search method, a random subset of hyperparameter combinations can be tested. The most optimal results are not guaranteed, but it can get relatively close~\cite{omalley2019kerastuner}. 
 
-TODO write about gpu and cpu, what metrics were used, what graphs were generated 
 
 \subsection{Scikit-learn}
+Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, SVR, CatBoostRegressor, KernelRidge, XGBRegressor, and DecisionTreeRegressor.
 
+Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best model had their performance compared using the same metrics. 
 
 TODO write about all models tested, how the preprocessing was the same insert graphs and talk about them 
 
