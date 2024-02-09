@@ -103,13 +103,10 @@ The hyperparameters of the DNN were tuned in an attempt to both improve the accu
 \subsection{Scikit-learn}
 Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, SVR, CatBoostRegressor, KernelRidge, XGBRegressor, and DecisionTreeRegressor.
 
-Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best model had their performance compared using the same metrics. 
-
-TODO write about all models tested, how the preprocessing was the same insert graphs and talk about them 
+Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best models had their performance compared using the same metrics. 
 
 \subsection{Finding Optimal Geometry}
-TODO write about methods used comparing sklaern, tensorflow
-
+The flowchart in Figure~\ref{data_flow} gives a visual representation of how the data flows through the algorithm. All of the steps up until generating predictions are performed initially for any new antenna configuration that the model hasn't seen yet. The last few steps, starting at filtering rows, are performed every time a new optimal geometry is searched using a specified S11 and frequency range. 
 
 \begin{Figure}
 \centering
@@ -118,16 +115,14 @@ TODO write about methods used comparing sklaern, tensorflow
 \label{data_flow}
 \end{Figure}
 
+A GUI (graphical user interface) was created in order to make the process of filtering optimal geometries more intuitive. The GUI include an input area, where a user can input a desired S11 and frequency range. Once these are entered, all of the permutations are filtered and the best performing optimal geometries are shown. A graph of frequency and predicted S11 is also shown, where each optimal geometry is plotted. The desired S11 and frequency range are also represented on the graph so it's clear what area of the graph is being focused on.
+
 
 \section{Results}
-All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9\-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
-
 \subsection{Library and Model Comparison with Leaky Wave Antenna}
 The Leaky Wave Antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN (deep neural network) provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1 with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
-
-Figure \ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of epochs increased. The fact that this graph shows both the training and testing decreasing shows that the model is converging. Additionally, the model is not overfitting. 
+The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1 with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
@@ -152,6 +147,8 @@ Figure \ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
 \end{center}
 \label{keras_best_params}
 \end{table}
+
+Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of epochs increased. The fact that this graph shows both the training and testing decreasing shows that the model is converging. Additionally, the model is not overfitting. 
 
 \begin{Figure}
     \centering
@@ -188,14 +185,13 @@ It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the bes
 \label{comparing_libraries}
 \end{table}
 
-TODO EXPLAIN BOTH THESE GRAPHS
-Both show how sklearn is better for this problem
+Figure~\ref{histogram_of_error} shows how the Sklearn model had lower error between the predicted S11 values and the actual S11 values than the TensorFlow model. The TensorFlow model tended to make predictions that were lower than the actual values. Additionally, Figure~\ref{actual_vs_predicted_s11} demonstrates how the S11 predictions were closer to the actual values, which is depicted by the diagonal line, for the Sklearn model. The TensorFlow model had trouble predicting thet outliers. 
 
 \begin{Figure}
     \centering
     \includegraphics[width=2.5in]{histogram}
     \captionof{figure}{Histogram of Error}
-    \label{historgram_of_error}
+    \label{histogram_of_error}
 \end{Figure}
 
 \begin{Figure}
@@ -209,6 +205,18 @@ Both show how sklearn is better for this problem
 The chosen model was given a set of 3 geometries that had never been seen before by either the training set or testing set. They 
 
 TODO FIX ME 
+
+\subsection{Finding Optimal Geometry}
+TODO talk about gui here 
+
+TODO replace image with something more high quality, find better example 
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2.5in]{gui}
+    \captionof{figure}{Actual vs Predicted S11}
+    \label{gui}
+\end{Figure}
 
 
 \section{Conclusion}
