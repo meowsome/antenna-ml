@@ -38,13 +38,15 @@ Antenna designs require simulation in order to determine the performance of the 
 
 
 \subsection{Dataset}
-The dataset that was used to train and test the machine learning models was generated from a parametric sweep of a Leaky Wave Antenna. The seven features of the dataset include Feed Gap (mm), Feed Inset (cm), Feed Width (cm), Ground Gap (mm), Pad Length (cm), Pad Width (cm), and Frequency (GHz). All of the features except the frequency represent a part of the antenna's geometry. Each of the features were paired with a label, which is a S11 value. 
+Two datasets were used to train and test the machine learning models. Both datasets were generated from a parametric sweep of the antenna. The two antennas that were used were a patch antenna and a leaky wave antenna. The seven features of the patch antenna dataset contained inset\_dist, L, sub\_thick, W, W0, y0, and Freq, with all measurements being in millimeters except frequency being GHz. The seven features of the leaky wave antenna dataset include Feed\_Gap (mm), Feed\_Inset (cm), Feed\_W (cm), Ground\_gap (mm), Pad\_L (cm), Pad\_W (cm), and Freq (GHz). All of the features except the frequency represent a part of the antenna's geometry. Each of the features were paired with a label, which is a S11 value. 
 
 
 \subsection{Simulation Issues}
 The main issue with running simulations in HFSS is the amount of time that it takes. The matrix operations that are required to run many iterations of simulations to analyze loss can take multiple days to complete~\cite{john_antenna_2009}. Depending on how the simulation is set up, this process could be impacted by power outages or software bugs, resulting in a loss of data and requiring manual intervention to re-run the simulation. 
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
+
+TODO write number of geometries and time taken from the patch antenna in addition to the leaky wave antenna
 
 By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 21 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated and new S11 values can be predicted. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
 
@@ -60,6 +62,8 @@ TODO ADD MORE
 
 
 \section{Methodology}
+TODO write about patch antenna in addition to leaky wave antenna in terms of num of rows and such 
+
 In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method using the parametric sweep dataset for the antenna geometry. Because the data is generated from a parametric sweep, it contains many different combinations of geometries. Out of the 4,221 rows, there were 21 unique geometries that each had a simulated S11 value for the same frequency range between 2 to 20. Generating all the permutations of geometries and frequencies added up to a total of 555 unique geometries, which includes the original 21. The real S11 values are used for the original 21, but predictions are generated for the rest of the geometry and frequency combinations. This new dataset includes a total of 111,555 rows. These values aid in providing a better guess of an optimal geometry for a specfiied S11 and frequency range, helping optimize the antenna faster. 
 
 \subsection{Analyzing the Data}
@@ -101,7 +105,7 @@ The hyperparameters of the DNN were tuned in an attempt to both improve the accu
 
 
 \subsection{Scikit-learn}
-Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, SVR, CatBoostRegressor, KernelRidge, XGBRegressor, and DecisionTreeRegressor.
+Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, SVR, CatBoostRegressor, XGBRegressor, and DecisionTreeRegressor.
 
 Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best models had their performance compared using the same metrics. 
 
@@ -119,10 +123,10 @@ A GUI (graphical user interface) was created in order to make the process of fil
 
 
 \section{Results}
-\subsection{Library and Model Comparison with Leaky Wave Antenna}
-The Leaky Wave Antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
+\subsection{Library and Model Comparison with the Patch Antenna}
+The patch antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1 with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
+The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1dB with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
@@ -157,13 +161,39 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
     \label{dnn_loss_graph}
 \end{Figure}
 
-TODO insert tensorflow epoch vs accuracy +- 1 graph? 
+Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Table~\ref{comparing_sklearn} for a summary of the results. The table is sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the highest accuracy and the lowest RMSE $R^2$. 
 
-TODO insert data about sklearn 
+It's clear by looking at the table that RandomForestRegressor is the best performing model. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual S11 values. When comparing TensorFlow to Scikit-learn, this is the model that will be used. 
 
-When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. 
+\begin{table}[h]
+\caption{Scikit\-learn Results}
+\begin{center}
+\begin{tabular}{ |c|c|c|c| }
+    \hline
+    Model Type & Accuracy within~$\pm$1dB & RMSE & $R^2$ \\ 
+    \hline
+    RandomForestRegressor & 0.9301 & 0.7652 & 0.9620 \\
+    \hline  
+    DecisionTreeRegressor & 0.9080 & 1.0764 & 0.9248 \\  
+    \hline
+    GradientBoostingRegressor & 0.9012 & 0.9950 & 0.9357 \\
+    \hline
+    CatBoostRegressor & 0.8969 & 0.9949 & 0.9358 \\    
+    \hline
+    XGBRegressor & 0.8942 & 1.0467 & 0.9289 \\  
+    \hline
+    AdaBoostRegressor & 0.8526 & 1.1924 & 0.9077 \\  
+    \hline
+    SVR & 0.6717 & 2.7252 & 0.5180 \\  
+    \hline
+\end{tabular}
+\end{center}
+\label{comparing_sklearn}
+\end{table}
 
-It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1. It trains and predicts significantly faster, and it has a lower RMSE.
+When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 44 of them due to the early stopping criteria that was set. 
+
+It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
 
 \begin{table}[h]
 \caption{Comparing Libraries}
@@ -172,33 +202,49 @@ It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the bes
     \hline
     Model Type & TensorFlow & Scikit-learn \\ 
     \hline
-    Training Time (ms) & 25500 & 8.2 \\  
+    Training Time (s) & 67.0 & 32.7 \\  
     \hline
-    Predicting Time (ms) & 86.7 & 3.65 \\
+    Predicting Time (s) & 0.327 & 2.17 \\
     \hline
-    S11 Accuracy within~$\pm$1 & 0.3175 & 0.60166 \\
+    S11 Accuracy within~$\pm$1dB & 0.7757 & 0.9301 \\
     \hline
-    RMSE & 16.7987 & 9.4661 \\
+    RMSE & 2.2026 & 0.7652 \\
     \hline
 \end{tabular}
 \end{center}
 \label{comparing_libraries}
 \end{table}
 
-Figure~\ref{histogram_of_error} shows how the Sklearn model had lower error between the predicted S11 values and the actual S11 values than the TensorFlow model. The TensorFlow model tended to make predictions that were lower than the actual values. Additionally, Figure~\ref{actual_vs_predicted_s11} demonstrates how the S11 predictions were closer to the actual values, which is depicted by the diagonal line, for the Sklearn model. The TensorFlow model had trouble predicting thet outliers. 
+Figure~\ref{histogram_of_error_patch} shows how the Sklearn model had lower error between the predicted S11 values and the actual S11 values than the TensorFlow model for the patch antenna. The TensorFlow model tended to make predictions that were lower than the actual values. Additionally, Figure~\ref{actual_vs_predicted_s11_patch} demonstrates how the S11 predictions were closer to the actual values, which is depicted by the diagonal line, for the Sklearn model. The TensorFlow model had trouble predicting thet outliers. 
 
 \begin{Figure}
     \centering
-    \includegraphics[width=2.5in]{histogram}
-    \captionof{figure}{Histogram of Error}
-    \label{histogram_of_error}
+    \includegraphics[width=2.5in]{histogram_patch}
+    \captionof{figure}{Histogram of Error for Patch Antenna}
+    \label{histogram_of_error_patch}
 \end{Figure}
 
 \begin{Figure}
     \centering
-    \includegraphics[width=2.5in]{actual_vs_predicted_s11}
-    \captionof{figure}{Actual vs Predicted S11}
-    \label{actual_vs_predicted_s11}
+    \includegraphics[width=2.5in]{actual_vs_predicted_s11_patch}
+    \captionof{figure}{Actual vs Predicted S11 for Patch Antenna}
+    \label{actual_vs_predicted_s11_patch}
+\end{Figure}
+
+Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_leaky_wave} show how the results for the leaky wave antenna are similar to those of the patch antenna. The leaky wave antenna was trained on significantly fewer geometries, and both figures show how the models were predicting with less accuracy for both Scikit-learn and Tensorflow. However, this does prove that Scikit-learn performed better for both antenna configurations.
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2.5in]{histogram_leaky_wave}
+    \captionof{figure}{Histogram of Error for Leaky Wave Antenna}
+    \label{histogram_of_error_leaky_wave}
+\end{Figure}
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2.5in]{actual_vs_predicted_s11_leaky_wave}
+    \captionof{figure}{Actual vs Predicted S11 for Leaky Wave Antenna}
+    \label{actual_vs_predicted_s11_leaky_wave}
 \end{Figure}
 
 \subsection{Testing with Completely Unseen Data}
