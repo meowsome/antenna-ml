@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-Antenna design process require extensive simulations tasks that are resource and time intensive, and are prone to interruptions. Furthermore, design equations are only available for predefined limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance. 
+Antenna design processes require extensive simulation tasks that are resource and time intensive, which are prone to interruptions. Design equations are only available for a predefined and limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance and frequency range. 
 \end{abstract}
 
 \section{Introduction}
@@ -46,9 +46,7 @@ The main issue with running simulations in HFSS is the amount of time that it ta
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
-TODO write number of geometries and time taken from the patch antenna in addition to the leaky wave antenna
-
-By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 21 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated and new S11 values can be predicted. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
+By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 405 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated and new S11 values can be predicted. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
 
 
 \subsection{Reversing the Problem}
@@ -62,9 +60,7 @@ TODO ADD MORE
 
 
 \section{Methodology}
-TODO write about patch antenna in addition to leaky wave antenna in terms of num of rows and such 
-
-In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method using the parametric sweep dataset for the antenna geometry. Because the data is generated from a parametric sweep, it contains many different combinations of geometries. Out of the 4,221 rows, there were 21 unique geometries that each had a simulated S11 value for the same frequency range between 2 to 20. Generating all the permutations of geometries and frequencies added up to a total of 555 unique geometries, which includes the original 21. The real S11 values are used for the original 21, but predictions are generated for the rest of the geometry and frequency combinations. This new dataset includes a total of 111,555 rows. These values aid in providing a better guess of an optimal geometry for a specfiied S11 and frequency range, helping optimize the antenna faster. 
+In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method using the parametric sweep dataset for the antenna geometry. Because the data is generated from a parametric sweep, it contains many different combinations of geometries. For the patch antenna, out of the 40,905 rows, there were 405 unique geometries that each had a simulated S11 value for the same frequency range between 4 to 12. In order to generate more data, more values for each geometry feature were inserted between the minimum and maximum of each feature. Generating all the permutations of the geometries and frequencies added up to a total of 9,720 unique geometries, which includes the original 405. The real S11 values are used for the original 405, but predictions are generated for the rest of the geometry and frequency combinations. This new dataset includes a total of 981,720 rows. Similarly, for the leaky wave antenna, there were 21 unique geometries that were used as training data between a frequency range between 2 to 20. There were 555 unique geometries in the end for this antenna design. These generated values for each antenna aided in providing a better guess of an optimal geometry for a specfiied S11 and frequency range, helping optimize the antenna faster. 
 
 \subsection{Analyzing the Data}
 In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value with high precision is very unlikely, so this tolerance allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range specified by the tolerance either above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
@@ -127,6 +123,8 @@ A GUI (graphical user interface) was created in order to make the process of fil
 The patch antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
 The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1dB with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
+
+TODO UPDATE TABLE WITH NEW VALUES and above with new percentage accuracy 
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
@@ -192,6 +190,8 @@ It's clear by looking at the table that RandomForestRegressor is the best perfor
 \end{table}
 
 When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 44 of them due to the early stopping criteria that was set. 
+
+TODO FIX NUMBERS BELOW
 
 It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
 
