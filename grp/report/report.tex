@@ -42,7 +42,7 @@ Two datasets were used to train and test the machine learning models. Both datas
 
 
 \subsection{Simulation Issues}
-The main issue with running simulations in HFSS is the amount of time that it takes. The matrix operations that are required to run many iterations of simulations to analyze loss can take multiple days to complete~\cite{john_antenna_2009}. Depending on how the simulation is set up, this process could be impacted by power outages or software bugs, resulting in a loss of data and requiring manual intervention to re-run the simulation. 
+The main issue with running simulations in HFSS is the amount of time that it takes. The matrix operations that are required to run many iterations of simulations to analyze loss can take multiple days to complete~\cite{john_antenna_2009,liu_efficient_2014}. Depending on how the simulation is set up, this process could be impacted by power outages or software bugs, resulting in a loss of data and requiring manual intervention to re-run the simulation. 
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
@@ -54,7 +54,13 @@ After training a machine learning model on the dataset, a table is produced with
 
 
 \section{Related Work}
-Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11. For rows of data, algorithms that have been used before can be something like a Artificial Neural Networks, Gaussian Network, or Gaussian Process Regression. The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for Convolutional Neural Networks and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions.~\cite{wu_machine_2023} 
+Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11. For rows of data, algorithms that have been used before can be something like an ANN (artificial neural network), Gaussian Network, or Gaussian Process Regression. 
+
+Liu et al.~used three different types of antennas of varying complexity, including antennas with 10, 19, and 7 parameters. They compared established methods to a newly proposed method~\cite{liu_efficient_2014}.
+
+The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for CNNs (convolutional neural networks) and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions. Wu et al.~explores building surrogate models and applying CNNs and Gaussian process regression~\cite{wu_machine_2023}.
+
+There has been less research performed with the intention of reversing the problem and receiving optimized geometry parameters from desired antenna performance values. Xiao et al.~applied an inverse ANN in an attempt to solve this problem,~\cite{XiaoLi-Ye2021IANN}.
 
 TODO ADD MORE 
 
@@ -89,7 +95,7 @@ The next preprocessing action that was performed was scaling. This process linea
 
 
 \subsection{Comparing Models}
-Two different libraries were compared in order to determine the best model for this type of dataset. The first library that was used is TensorFlow, which was used to create a DNN (deep neural network). The performance of the DNN was compared to many of Scikit-learn's regression models.
+Two different libraries were compared in order to determine the best model for this type of dataset. The first library that was used is TensorFlow, which was used to create a DNN (deep neural network)~\cite{tensorflow2015-whitepaper}. The performance of the DNN was compared to many of Scikit-learn's regression models~\cite{scikit-learn}.
 
 To keep the comparison between the algorithms fair, all preprocessing steps were performed in the same way when comparing the performance of different libraries and algorithms. When splitting the dataset into training and testing portions, the dataset was split with the same random state, meaning that every model received the same random subset of data for training. Additionally, the models were evaluated in the same way using the same performance metrics between the different libraries. All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9\-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
 
@@ -97,7 +103,7 @@ To keep the comparison between the algorithms fair, all preprocessing steps were
 \subsection{TensorFlow}
 TensorFlow was used to create a DNN (deep neural network), which is useful for large datasets. The main benefit of a DNN is that it automatically figures out the most important correlations between features for you. 
 
-The hyperparameters of the DNN were tuned in an attempt to both improve the accuracy and reduce the error rate of the model. This was done by adjusting various hyperparameters of the model, including the number of layers in the network, the rate at which the model learns, andw the unit of each layer, which represents the number of neurons and outputs. This was done using a randomized searching method. In typical grid search hyperparameter tuning, the search space grows too large to be feasibly tested fairly quickly. With the randomized search method, a random subset of hyperparameter combinations can be tested. The most optimal results are not guaranteed, but it can get relatively close~\cite{omalley2019kerastuner}. 
+The hyperparameters of the DNN were tuned in an attempt to both improve the accuracy and reduce the error rate of the model. This was done by adjusting various hyperparameters of the model, including the number of layers in the network, the rate at which the model learns, and the unit of each layer, which represents the number of neurons and outputs. This was done using a randomized searching method provided by Keras Tuner~\cite{omalley2019kerastuner}. In typical grid search hyperparameter tuning, the search space grows too large to be feasibly tested fairly quickly. With the randomized search method, a random subset of hyperparameter combinations can be tested. The most optimal results are not guaranteed, but it can get relatively close~\cite{meanti_efficient_2022}. 
 
 
 \subsection{Scikit-learn}
@@ -122,28 +128,26 @@ A GUI (graphical user interface) was created in order to make the process of fil
 \subsection{Library and Model Comparison with the Patch Antenna}
 The patch antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. It found that the model performed best with the maximum number of layers out of the testing range, and the optimal learning rate was in the middle of the testing range. This DNN was only able to predict S11 values with an error tolerance of~$\pm$1dB with a 31.75\% accuracy. This low accuracy gives the hint that this might not be the best model for the job.
-
-TODO UPDATE TABLE WITH NEW VALUES and above with new percentage accuracy 
+The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. This was tested for both the patch antenna and the leaky wave antenna. The patch antenna was found to work best with a smaller DNN consisting of only two layers, where the leaky wave antenna performed best with more layers. The optimal learning rate was similar for both antennas, with the patch antenna having the higher learning rate. The DNNs were able to predict S11 values with an error tolerance of~$\pm$1dB for the patch antenna and leaky wave antenna with a 77.57\% and 31.75\% accuracy respectively. These accuracies are not desirable, and might be an indicator that a DNN is too complex for this job.
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
 \begin{center}
-\begin{tabular}{ |c|c|c| }
+\begin{tabular}{ |c|c|c|c| }
     \hline
-    Hyperparameter Name & Hyperparameter Value \\ 
+    Name & Patch Value & Leaky Wave Value \\ 
     \hline
-    num\_layers & 4 \\  
+    num\_layers & 2 & 4 \\  
     \hline
-    units\_0 & 256 \\
+    units\_0 & 416 & 256 \\
     \hline
-    units\_1 & 32 \\
+    units\_1 & 32 & 32 \\
     \hline
-    units\_2 & 32 \\
+    units\_2 & N/A & 32 \\
     \hline
-    units\_3 & 32 \\
+    units\_3 & N/A & 32 \\
     \hline
-    learning\_rate & 0.011724 \\
+    learning\_rate & 0.0884 & 0.011724 \\
     \hline
 \end{tabular}
 \end{center}
@@ -191,9 +195,7 @@ It's clear by looking at the table that RandomForestRegressor is the best perfor
 
 When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 44 of them due to the early stopping criteria that was set. 
 
-TODO FIX NUMBERS BELOW
-
-It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 28.42\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
+It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 15.44\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
 
 \begin{table}[h]
 \caption{Comparing Libraries}
@@ -267,8 +269,9 @@ TODO replace image with something more high quality, find better example
 
 \section{Conclusion}
 
-TODO CITE CAMERON for data
-TODO cite TensorFlow
+
+\section*{Acknowledgment}
+The author would like to thank Cameron Martinez for his assistance in providing the datasets for both the patch antenna and the leaky wave antenna that were used for this research. Cameron was also very helpful in analyzing the performance of the models as compared to the actual simulated data. Additionally, the author would like to thank Dr.~Rojas and the WiDE Lab for providing support for this research and a space to work.
 
 
 \bibliographystyle{IEEEtran}

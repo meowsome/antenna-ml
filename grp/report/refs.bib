@@ -36,6 +36,24 @@
 	file = {IEEE Xplore Abstract Record:C\:\\Users\\Tyler\\Zotero\\storage\\RSMIMED2\\10379000.html:text/html;IEEE Xplore Full Text PDF:C\:\\Users\\Tyler\\Zotero\\storage\\F86UQVN3\\Wu et al. - 2023 - Machine Learning-Assisted Optimization for Antenna.pdf:application/pdf},
 }
 
+@article{XiaoLi-Ye2021IANN,
+issn = {0018-926X},
+journal = {IEEE transactions on antennas and propagation},
+keywords = {Algorithm ; Antenna (radio) ; Antenna design ; Antenna radiation patterns ; Artificial neural network ; Artificial neural networks ; Computational modeling ; Computer science ; Extreme learning machine ; Integrated circuit modeling ; Inverse ; inverse artificial neural network (ANN) ; Microwave antennas ; multiobjective ; Optimization ; Process (computing) ; Radiation pattern ; Set (abstract data type) ; Small number ; Training ; transfer function (TF)},
+language = {eng},
+number = {10},
+pages = {6651-6659},
+publisher = {IEEE},
+title = {Inverse Artificial Neural Network for Multiobjective Antenna Design},
+volume = {69},
+year = {2021},
+author = {Xiao, Li-Ye and Shao, Wei and Jin, Fu-Long and Wang, Bing-Zhong and Liu, Qing Huo},
+abstract = {To improve the convenience and efficiency of antenna design, in this article, a novel inverse artificial neural network (ANN) model is proposed in which antenna performance indexes are set as the input and corresponding geometrical variables are set as the output. To solve the multiobjective problem of antenna modeling, the first part of the ANN model involves three parallel and independent branches for S -parameter, gain, and radiation pattern, and the second part outputs a final predicted result. Once the training is completed, the proposed inverse model can provide antenna geometries directly without being repetitively called by an optimization algorithm. Compared with the inverse extreme learning machine and five state-of-art forward models, the proposed model uses a small number of training samples and directly obtains the satisfying values of geometrical variables without any optimization process.},
+}
+
+
+
+
 @article{haque_machine_2023,
 	title = {Machine learning-based technique for gain and resonance prediction of mid band {5G} {Yagi} antenna},
 	volume = {13},
@@ -73,6 +91,103 @@ Publisher: Nature Publishing Group},
 	year = {2022},
 	pages = {4989--5003},
 	file = {M. El-kenawy et al. - 2022 - Optimized Ensemble Algorithm for Predicting Metama.pdf:C\:\\Users\\Tyler\\Zotero\\storage\\Q59PIQKT\\M. El-kenawy et al. - 2022 - Optimized Ensemble Algorithm for Predicting Metama.pdf:application/pdf},
+}
+
+
+@misc{meanti_efficient_2022,
+	title = {Efficient {Hyperparameter} {Tuning} for {Large} {Scale} {Kernel} {Ridge} {Regression}},
+	url = {http://arxiv.org/abs/2201.06314},
+	doi = {10.48550/arXiv.2201.06314},
+	abstract = {Kernel methods provide a principled approach to nonparametric learning. While their basic implementations scale poorly to large problems, recent advances showed that approximate solvers can efficiently handle massive datasets. A shortcoming of these solutions is that hyperparameter tuning is not taken care of, and left for the user to perform. Hyperparameters are crucial in practice and the lack of automated tuning greatly hinders efficiency and usability. In this paper, we work to fill in this gap focusing on kernel ridge regression based on the Nystr{\textbackslash}"om approximation. After reviewing and contrasting a number of hyperparameter tuning strategies, we propose a complexity regularization criterion based on a data dependent penalty, and discuss its efficient optimization. Then, we proceed to a careful and extensive empirical evaluation highlighting strengths and weaknesses of the different tuning strategies. Our analysis shows the benefit of the proposed approach, that we hence incorporate in a library for large scale kernel methods to derive adaptively tuned solutions.},
+	urldate = {2024-02-02},
+	publisher = {arXiv},
+	author = {Meanti, Giacomo and Carratino, Luigi and De Vito, Ernesto and Rosasco, Lorenzo},
+	month = jan,
+	year = {2022},
+	note = {arXiv:2201.06314 [cs, stat]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+	annote = {Comment: 24 pages, 3 figures},
+	file = {arXiv Fulltext PDF:C\:\\Users\\Tyler\\Zotero\\storage\\AGGLXRZZ\\Meanti et al. - 2022 - Efficient Hyperparameter Tuning for Large Scale Ke.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\Tyler\\Zotero\\storage\\3DXJ23M8\\2201.html:text/html},
+}
+
+
+@article{liu_efficient_2014,
+	title = {An {Efficient} {Method} for {Antenna} {Design} {Optimization} {Based} on {Evolutionary} {Computation} and {Machine} {Learning} {Techniques}},
+	volume = {62},
+	issn = {1558-2221},
+	url = {https://ieeexplore.ieee.org/document/6612668},
+	doi = {10.1109/TAP.2013.2283605},
+	abstract = {In recent years, various methods from the evolutionary computation (EC) field have been applied to electromagnetic (EM) design problems and have shown promising results. However, due to the high computational cost of the EM simulations, the efficiency of directly using evolutionary algorithms is often very low (e.g., several weeks' optimization time), which limits the application of these methods for many industrial applications. To address this problem, a new method, called surrogate model assisted differential evolution for antenna synthesis (SADEA), is presented in this paper. The key ideas are: (1) A Gaussian Process (GP) surrogate model is constructed on-line to predict the performances of the candidate designs, saving a lot of computationally expensive EM simulations. (2) A novel surrogate model-aware evolutionary search mechanism is proposed, directing effective global search even when a traditional high-quality surrogate model is not available. Three complex antennas and two mathematical benchmark problems are selected as examples. Compared with the widely used differential evolution and particle swarm optimization, SADEA can obtain comparable results, but achieves a 3 to 7 times speed enhancement for antenna design optimization.},
+	number = {1},
+	urldate = {2024-01-13},
+	journal = {IEEE Transactions on Antennas and Propagation},
+	author = {Liu, Bo and Aliakbarian, Hadi and Ma, Zhongkun and Vandenbosch, Guy A. E. and Gielen, Georges and Excell, Peter},
+	month = jan,
+	year = {2014},
+	note = {Conference Name: IEEE Transactions on Antennas and Propagation},
+	pages = {7--18},
+	file = {IEEE Xplore Abstract Record:C\:\\Users\\Tyler\\Zotero\\storage\\PNNH9QI9\\6612668.html:text/html;IEEE Xplore Full Text PDF:C\:\\Users\\Tyler\\Zotero\\storage\\QTXLI9K6\\Liu et al. - 2014 - An Efficient Method for Antenna Design Optimizatio.pdf:application/pdf},
+}
+
+
+@misc{tensorflow2015-whitepaper,
+title={ {TensorFlow}: Large-Scale Machine Learning on Heterogeneous Systems},
+url={https://www.tensorflow.org/},
+note={Software available from tensorflow.org},
+author={
+    Mart\'{i}n~Abadi and
+    Ashish~Agarwal and
+    Paul~Barham and
+    Eugene~Brevdo and
+    Zhifeng~Chen and
+    Craig~Citro and
+    Greg~S.~Corrado and
+    Andy~Davis and
+    Jeffrey~Dean and
+    Matthieu~Devin and
+    Sanjay~Ghemawat and
+    Ian~Goodfellow and
+    Andrew~Harp and
+    Geoffrey~Irving and
+    Michael~Isard and
+    Yangqing Jia and
+    Rafal~Jozefowicz and
+    Lukasz~Kaiser and
+    Manjunath~Kudlur and
+    Josh~Levenberg and
+    Dandelion~Man\'{e} and
+    Rajat~Monga and
+    Sherry~Moore and
+    Derek~Murray and
+    Chris~Olah and
+    Mike~Schuster and
+    Jonathon~Shlens and
+    Benoit~Steiner and
+    Ilya~Sutskever and
+    Kunal~Talwar and
+    Paul~Tucker and
+    Vincent~Vanhoucke and
+    Vijay~Vasudevan and
+    Fernanda~Vi\'{e}gas and
+    Oriol~Vinyals and
+    Pete~Warden and
+    Martin~Wattenberg and
+    Martin~Wicke and
+    Yuan~Yu and
+    Xiaoqiang~Zheng},
+  year={2015},
+}
+
+@article{scikit-learn,
+  title={Scikit-learn: Machine Learning in {P}ython},
+  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+          and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+          and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+          Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  pages={2825--2830},
+  year={2011}
 }
 
 @misc{omalley2019kerastuner,
