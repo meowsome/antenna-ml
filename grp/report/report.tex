@@ -60,7 +60,7 @@ Liu et al.~used three different types of antennas of varying complexity, includi
 
 The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for CNNs (convolutional neural networks) and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions. Wu et al.~explores building surrogate models and applying CNNs and Gaussian process regression~\cite{wu_machine_2023}.
 
-There has been less research performed with the intention of reversing the problem and receiving optimized geometry parameters from desired antenna performance values. Xiao et al.~applied an inverse ANN in an attempt to solve this problem,~\cite{XiaoLi-Ye2021IANN}.
+There has been less research performed with the intention of reversing the problem and receiving optimized geometry parameters from desired antenna performance values. Xiao et al.~applied an inverse ELM (extreme learning machine) and an ANN in an attempt to solve this problem, using multiple different performance metrics instead of just one as the input. The ELM strategy applies two algorithms for both classifying similar curves and then training~\cite{9063448}. The ANN improves the accuracy of the ELM and helps organize the environment~\cite{XiaoLi-Ye2021IANN}.
 
 TODO ADD MORE 
 
@@ -69,13 +69,19 @@ TODO ADD MORE
 In order to determine the optimal antenna geometry, a machine learning algorithm was employed. This algorithm is trained with a supervised learning method using the parametric sweep dataset for the antenna geometry. Because the data is generated from a parametric sweep, it contains many different combinations of geometries. For the patch antenna, out of the 40,905 rows, there were 405 unique geometries that each had a simulated S11 value for the same frequency range between 4 to 12. In order to generate more data, more values for each geometry feature were inserted between the minimum and maximum of each feature. Generating all the permutations of the geometries and frequencies added up to a total of 9,720 unique geometries, which includes the original 405. The real S11 values are used for the original 405, but predictions are generated for the rest of the geometry and frequency combinations. This new dataset includes a total of 981,720 rows. Similarly, for the leaky wave antenna, there were 21 unique geometries that were used as training data between a frequency range between 2 to 20. There were 555 unique geometries in the end for this antenna design. These generated values for each antenna aided in providing a better guess of an optimal geometry for a specfiied S11 and frequency range, helping optimize the antenna faster. 
 
 \subsection{Analyzing the Data}
-In order to determine if a S11 value was predicted accurately, a tolerance was utilized. An exact prediction of an S11 value with high precision is very unlikely, so this tolerance allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range specified by the tolerance either above or below the true value. The tolerance is important for an accurate model, and ideally this value should be below one.
+A regression algorithm was chosen as the label is numeric. 20\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remaining 80\% was used to train the models.
 
-A regression algorithm was chosen as the label is numeric. 20\% of the dataset provided by the parametric sweep was reserved for testing and comparing the performance of the models, and the remainding 80\% was used to train the models. Two common metrics to compare algorithm performance in addition to the tolerance mentioned above are the $R^2$ score~\eqref{eq:rsquared} and the RMSE (Root Mean Squared Error)~\eqref{eq:rmse}~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. 
+In order to determine if a S11 value was predicted accurately or not, a tolerance was utilized. An exact prediction of an S11 value with high precision is very unlikely, so this tolerance allows for some flexibility. The tolerance is the error that we allow the value to contain, and we consider the prediction accurate if it is within the range specified by the tolerance either above or below the true value. This concept is used when calculating the score of a model~\eqref{eq:tolerance}, with $\epsilon$ being tolerance, $\hat{y_i}$ being the $i$th S11 prediction, $y_i$ being the $i$th true S11 value, and $n$ being the count of data points. The tolerance is important for an accurate model, and ideally this value should be below one. The tolerance is assumed to be one when calculating all scores mentioned in this paper.
+
+Two other common metrics to compare algorithm performance in addition to the tolerance mentioned above are the $R^2$ score~\eqref{eq:rsquared} and the RMSE (Root Mean Squared Error)~\eqref{eq:rmse}~\cite{haque_machine_2023,m_el-kenawy_optimized_2022}. The $R^2$ score represents how well the regression line fit to the data. It is calculated by taking the squared sum of the residuals divided by the sum of the distance the data is away from the mean all squared. The RMSE represents the difference between the predicted and true values. It is calculated by taking the sum of all squared differences between predicted values and true values, dividing the result by number of values, and square rooting.
 
 \begin{figure}[h]
     \begin{equation}
-        R^2 = 1 - \frac{\text{SSR}}{\text{SST}}
+        \text{Score} = \frac{1}{n} \sum_{i=1}^{n}(\left|\hat{y_i} - y_i\right| \leq \epsilon)
+        \label{eq:tolerance}
+    \end{equation}
+    \begin{equation}
+        R^2 = 1 - \frac{\sum_{i}(\hat{y_i} - \bar{y})^2}{\sum_{i}(y_i - \bar{y})^2}
         \label{eq:rsquared}
     \end{equation}
     \begin{equation}
