@@ -30,11 +30,11 @@
 \maketitle
 
 \begin{abstract}
-Antenna design processes require extensive simulation tasks that are resource and time intensive, which are prone to interruptions. Design equations are only available for a predefined and limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance and frequency range. 
+Antenna design processes require extensive EM (electromagnetic) simulation tasks that are resource and time intensive, which are prone to interruptions. Design equations are only available for a predefined and limited set of antenna geometries. By applying a machine learning algorithm to data that has already been generated from simulations of an antenna, performance metrics can be predicted significantly quicker than running full simulations. Insights about which geometric parameter had the most significant impact on the prediction can be drawn from the model and included in the output. Additionally, the model can be reversed so that for a particular form of antenna, an optimal geometry can be produced that will result in a specified performance and frequency range. 
 \end{abstract}
 
 \section{Introduction}
-Antenna designs require simulation in order to determine the performance of the antenna. Ansys High Frequency Simulation Software (HFSS) is an electromagnetic simulation software which is used to design and simulate antennas between a range of frequencies. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run. These simulations produce S11 values, which are the reflection coefficients. These represent the amount of power that is reflected from the antenna, and is measured in decibels. This value is always negative, and a lower value means the antenna is performing more efficiently. Ideally, this value is below -10dB~\cite{Bevelacqua_2015}.
+Antenna designs require simulation in order to determine the performance of the antenna. The high-frequency structure simulator (HFSS) is an electromagnetic simulation software which is used to design and simulate antennas between a range of frequencies. When designing the antenna, details such as dimensions of the antenna geometry, materials used for the antenna, and frequency are specified~\cite{Maxworth_2022}. Simulations are then run. These simulations produce S11 values, which are the reflection coefficients. These represent the amount of power that is reflected from the antenna, and is measured in decibels. This value is always negative, and a lower value means the antenna is performing more efficiently. Ideally, this value is below -10dB~\cite{Bevelacqua_2015}.
 
 
 \subsection{Dataset}
@@ -46,7 +46,7 @@ The main issue with running simulations in HFSS is the amount of time that it ta
 
 HFSS works by specifying a range of dimensions and outputting performance metrics, such as S11 values. This is insightful, but there is a degree of trial and error involved in finding an optimal antenna geometry. One would start by specifying what they would think would be the ideal antenna geometry using their own intuition. Based on the results from an initial simulation run, geometry values would be adjusted in an attempt to optimize the geometry.
 
-By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 405 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated and new S11 values can be predicted. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
+By using a machine learning algorithm to do the bulk of the investigative work, the amount of simulation iterations that need to be run to optimize an antenna's geometry can be significantly reduced. By training the model on the 405 geometries, frequencies, and S11 values, permutations of more geometries and frequencies can be generated computationally and new S11 values can be predicted using the model. These predictions can be searched, making it easier and quicker to narrow down to a specific area of interest without having to wait for simulations to run.
 
 
 \subsection{Reversing the Problem}
@@ -54,15 +54,11 @@ After training a machine learning model on the dataset, a table is produced with
 
 
 \section{Related Work}
-Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11. For rows of data, algorithms that have been used before can be something like an ANN (artificial neural network), Gaussian Network, or Gaussian Process Regression. 
+Machine learning topics with antenna design optimizations have been explored before. The algorithm and methods that are chosen ultimately depend on the way that the antenna geometry is expressed. One format that the input data can have is to be in tabular format, where rows represent combinations of geometry measurements and some performance specification, such as S11.
 
-Liu et al.~used three different types of antennas of varying complexity, including antennas with 10, 19, and 7 parameters. They compared established methods to a newly proposed method~\cite{liu_efficient_2014}.
+Liu et al.~used three different types of antennas of varying complexity, including antennas with 10, 19, and 7 geometric parameters. They use a Gaussian Process surrogate model and an evolutionary search mechanism~\cite{liu_efficient_2014}. He et al.~combined an ANN with a simulated annealing algorithm of a wideband patch antenna with four geometric parameters.~\cite{10318051}. All of the above examples have decreased both the amount of time taken and the computational expensiveness when compared to typical EM simulations.
 
-The other type of format that the input data can have would be where the geometry is represented with pixels with a matrix of integers each representing a different material being used. This second format is useful for CNNs (convolutional neural networks) and allows for exploring new antenna geometry designs instead of only staying within predefined restrictions. Wu et al.~explores building surrogate models and applying CNNs and Gaussian process regression~\cite{wu_machine_2023}.
-
-There has been less research performed with the intention of reversing the problem and receiving optimized geometry parameters from desired antenna performance values. Xiao et al.~applied an inverse ELM (extreme learning machine) and an ANN in an attempt to solve this problem, using multiple different performance metrics instead of just one as the input. The ELM strategy applies two algorithms for both classifying similar curves and then training~\cite{9063448}. The ANN improves the accuracy of the ELM and helps organize the environment~\cite{XiaoLi-Ye2021IANN}.
-
-TODO ADD MORE 
+There has been less research performed with the intention of reversing the problem and receiving optimized geometry parameters from specified desired antenna performance values. Xiao et al.~applied an inverse ELM (extreme learning machine) and an ANN in an attempt to solve this problem, using multiple different performance metrics instead of just one as the input. The ELM strategy applies two algorithms for classifying similar curves and training~\cite{9063448}. The ANN improves the accuracy of the ELM and helps organize the environment~\cite{XiaoLi-Ye2021IANN}.
 
 
 \section{Methodology}
@@ -103,7 +99,7 @@ The next preprocessing action that was performed was scaling. This process linea
 \subsection{Comparing Models}
 Two different libraries were compared in order to determine the best model for this type of dataset. The first library that was used is TensorFlow, which was used to create a DNN (deep neural network)~\cite{tensorflow2015-whitepaper}. The performance of the DNN was compared to many of Scikit-learn's regression models~\cite{scikit-learn}.
 
-To keep the comparison between the algorithms fair, all preprocessing steps were performed in the same way when comparing the performance of different libraries and algorithms. When splitting the dataset into training and testing portions, the dataset was split with the same random state, meaning that every model received the same random subset of data for training. Additionally, the models were evaluated in the same way using the same performance metrics between the different libraries. All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained a  Intel\textregistered~Core\texttrademark~i9\-10900X CPU @ 3.70GHz and a NVIDIA GeForce RTX 3090 graphics card. 
+To keep the comparison between the algorithms fair, all preprocessing steps were performed in the same way when comparing the performance of different libraries and algorithms. When splitting the dataset into training and testing portions, the dataset was split with the same random state, meaning that every model received the same random subset of data for training. Additionally, the models were evaluated in the same way using the same performance metrics between the different libraries. All of the following were performed on the same machine to eliminate the possibility of hardware anomalies. The machine that was used contained an Intel i9\-10900X 3.70 GHz CPU with 64 GB RAM and a NVIDIA GeForce RTX 3090 graphics card. 
 
 
 \subsection{TensorFlow}
@@ -274,6 +270,11 @@ TODO replace image with something more high quality, find better example
 
 
 \section{Conclusion}
+Applying a machine learning algorithm as an aid in the process of optimizing  antenna geometric parameters with EM simulations greatly reduces the amount of time and computational power required. Training a model on a small set of data obtained from a parameteric sweep allows the model to fit to the trend of data. Large amounts of additional data can then be generated within the bounds of the existing data, and performance predictions can be made for this generated data with a high accuracy. The most optimal geometries can be returned for specified performance values and frequency ranges, making the trial-and-error process of finding these geometries by running simulations unnecessary. 
+
+Using Scikit-learn regression models had better accuracy and lower training and testing times than a DNN built with TensorFlow. This is because the Scikit-learn models are simpler than a DNN and are more optimized for the task.  
+
+TODO FINISH ME 
 
 
 \section*{Acknowledgment}
