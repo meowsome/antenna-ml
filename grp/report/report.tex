@@ -137,7 +137,7 @@ A GUI (graphical user interface) was created in order to make the process of fil
 \subsection{Library and Model Comparison with the Patch Antenna}
 The patch antenna was used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. This was tested for both the patch antenna and the leaky wave antenna. The patch antenna was found to work best with a smaller DNN consisting of only two layers, where the leaky wave antenna performed best with more layers. The optimal learning rate was similar for both antennas, with the patch antenna having the higher learning rate. The DNNs were able to predict $S_{11}$ values with an error tolerance of~$\pm$1dB for the patch antenna and leaky wave antenna with a 77.57\% and 31.75\% accuracy respectively. These accuracies are not desirable, and might be an indicator that a DNN is too complex for this job.
+The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. This was tested for both the patch antenna and the leaky wave antenna. The patch antenna was found to work best with a smaller DNN consisting of only two layers, where the leaky wave antenna performed best with more layers. The optimal learning rate was similar for both antennas, with the patch antenna having the higher learning rate. The DNNs were able to predict $S_{11}$ values with an error tolerance of~$\pm$1dB for the patch antenna and leaky wave antenna with a 84.17\% and 26.63\% accuracy respectively. These accuracies are not desirable, and might be an indicator that a DNN is too complex for this job.
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
@@ -146,17 +146,15 @@ The Keras Tuner search for optimal hyperparameters of the DNN provided the resul
     \hline
     Name & Patch Value & Leaky Wave Value \\ 
     \hline
-    num\_layers & 2 & 4 \\  
+    num\_layers & 2 & 3 \\  
     \hline
-    units\_0 & 416 & 256 \\
+    units\_0 & 256 & 480 \\
     \hline
     units\_1 & 32 & 32 \\
     \hline
     units\_2 & N/A & 32 \\
     \hline
-    units\_3 & N/A & 32 \\
-    \hline
-    learning\_rate & 0.0884 & 0.011724 \\
+    learning\_rate & 0.0841 & 0.0250 \\
     \hline
 \end{tabular}
 \end{center}
@@ -168,11 +166,11 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
 \begin{Figure}
     \centering
     \includegraphics[width=2.5in]{loss}
-    \captionof{figure}{DNN Loss Graph}
+    \captionof{figure}{DNN Loss Graph for Patch Antenna}
     \label{dnn_loss_graph}
 \end{Figure}
 
-Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Table~\ref{comparing_sklearn} for a summary of the results. The table is sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the highest accuracy and the lowest RMSE $R^2$. 
+Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Table~\ref{comparing_sklearn} for a summary of the results. The table is sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the accuracy and $R^2$ closest to one, and the RMSE closest to zero. 
 
 It's clear by looking at the table that RandomForestRegressor is the best performing model. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. When comparing TensorFlow to Scikit-learn, this is the model that will be used. 
 
@@ -202,9 +200,9 @@ It's clear by looking at the table that RandomForestRegressor is the best perfor
 \label{comparing_sklearn}
 \end{table}
 
-When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 44 of them due to the early stopping criteria that was set. 
+When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 35 of them due to the early stopping criteria that was set. 
 
-It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 15.44\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
+It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the best choice of library for this problem. The Scikit-learn model performed with 8.97\% better accuracy when predicting values with a tolerance of~$\pm$1dB. It trains and predicts significantly faster, and it has a lower RMSE.
 
 \begin{table}[h]
 \caption{Comparing Libraries}
@@ -213,20 +211,20 @@ It's clear from the Table~\ref{comparing_libraries} that Scikit-learn is the bes
     \hline
     Model Type & TensorFlow & Scikit-learn \\ 
     \hline
-    Training Time (s) & 67.0 & 32.7 \\  
+    Training Time (s) & 273.0s & 88.0 \\  
     \hline
-    Predicting Time (s) & 0.327 & 2.17 \\
+    Predicting Time (s) & 2.91 & 3.69 \\
     \hline
-    $S_{11}$ Accuracy within~$\pm$1dB & 0.7757 & 0.9301 \\
+    $S_{11}$ Accuracy within~$\pm$1dB & 0.8417 & 0.9314 \\
     \hline
-    RMSE & 2.2026 & 0.7652 \\
+    RMSE & 1.5050 & 0.7851 \\
     \hline
 \end{tabular}
 \end{center}
 \label{comparing_libraries}
 \end{table}
 
-Figure~\ref{histogram_of_error_patch} shows how the Sklearn model had lower error between the predicted $S_{11}$ values and the actual $S_{11}$ values than the TensorFlow model for the patch antenna. The TensorFlow model tended to make predictions that were lower than the actual values. Additionally, Figure~\ref{actual_vs_predicted_s11_patch} demonstrates how the $S_{11}$ predictions were closer to the actual values, which is depicted by the diagonal line, for the Sklearn model. The TensorFlow model had trouble predicting thet outliers. 
+Figure~\ref{histogram_of_error_patch} shows how the Sklearn model had lower error between the predicted $S_{11}$ values and the actual $S_{11}$ values than the DNN model for the patch antenna. The DNN model tended to make predictions that were lower than the actual values. Additionally, Figure~\ref{actual_vs_predicted_s11_patch} demonstrates how the $S_{11}$ predictions were closer to the actual values, which is depicted by the diagonal line, for the Sklearn model. The DNN model had trouble predicting thet outliers. 
 
 \begin{Figure}
     \centering
@@ -242,7 +240,7 @@ Figure~\ref{histogram_of_error_patch} shows how the Sklearn model had lower erro
     \label{actual_vs_predicted_s11_patch}
 \end{Figure}
 
-Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_leaky_wave} show how the results for the leaky wave antenna are similar to those of the patch antenna. The leaky wave antenna was trained on significantly fewer geometries, and both figures show how the models were predicting with less accuracy for both Scikit-learn and Tensorflow. However, this does prove that Scikit-learn performed better for both antenna configurations.
+Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_leaky_wave} show how the results for the leaky wave antenna are similar to those of the patch antenna. The leaky wave antenna was trained on significantly fewer geometries, which is reflected by the poorer overall performance of both the DNN model and the Scikit-learn model. Similarly to with the patch antenna, both figures prove that the Scikit-learn model makes $S_{11}$ predictions with higher accuracy than the DNN model.
 
 \begin{Figure}
     \centering
