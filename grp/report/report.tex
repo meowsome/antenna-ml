@@ -256,10 +256,45 @@ Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_lea
     \label{actual_vs_predicted_s11_leaky_wave}
 \end{Figure}
 
-\subsection{Testing with Completely Unseen Data}
-The chosen model was given a set of 3 geometries that had never been seen before by either the training set or testing set. They 
+\subsection{Testing with Completely Unseen Geometries}
+The chosen model was given a set of 6 random geometries from the patch antenna that had never been seen before by either the training set or testing set. These geometries were part of the permutations that were generated to create the dataset for optimal geometry searching. The geometric parameters of the chosen unseen geometries are recorded in Table~\ref{unseen_geometries}.
 
-TODO FIX ME 
+It's worth noting that each of the geometric parameters that were chosen for the unseen geometries lay within the range of the minimum and maximum value for each respective parameter. Due to the scaling that was performed during the preprocessing steps, any predictions made with geometric parameters that lay outside of the original range of the training data are capped as if the data point outside of the range was actually the corresponding minimum or maximum. Therefore, it didn't make sense to include any geometric parameters outside of the geometric parameters respective ranges. 
+
+\begin{table}[h]
+\caption{Unseen Geometry Parameters}
+\begin{center}
+\begin{tabular}{ |l|p{0.12\linewidth}|l|p{0.12\linewidth}|l|l|l| }
+    \hline
+    ID & inset\_dist [mm] & L [mm] & sub\_thick [mm] & W [mm] & W0 [mm] & y0 [mm] \\ 
+    \hline
+    1 & 0.6 & 11.5 & 2.0 & 14.8 & 2.5 & 4.25 \\
+    \hline
+    2 & 0.6 & 12.0 & 2.0 & 14.8 & 2.75 & 4.5 \\
+    \hline
+    3 & 1.0 & 12.0 & 2.0 & 15.6 & 3.5 & 4.25 \\
+    \hline
+    4 & 1.4 & 11.5 & 2.0 & 15.6 & 3.5 & 4.25 \\
+    \hline
+    5 & 1.4 & 11.5 & 2.0 & 15.4 & 3.5 & 4.5 \\
+    \hline
+    6 & 1.4 & 11.75 & 2.0 & 15.4 & 3.5 & 4.75 \\
+    \hline
+\end{tabular}
+\end{center}
+\label{unseen_geometries}
+\end{table}
+
+These unseen geometries were run through both the HFSS and the chosen machine learning model in order to obtain simulated and predicted $S_{11}$ values. This process was completed for the entire frequency range of the patch antenna. The results are shown in Figure~\ref{unseen_geometries_graph}, where each unseen geometry has its predicted $S_{11}$ values plotted alongside the simulated values for each frequency in the frequency range.
+
+TODO WRITE more and actually update graph once cameron gets back to me 
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2.5in]{unseen_geometries_freq_vs_seq}
+    \captionof{figure}{Simulated \& Predicted $S_{11}$ Values for Frequency Range of Unseen Geometries}
+    \label{unseen_geometries_graph}
+\end{Figure}
 
 \subsection{Finding Optimal Geometry}
 TODO talk about gui here 
