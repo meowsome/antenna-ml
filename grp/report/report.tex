@@ -116,7 +116,7 @@ The hyperparameters of the DNN were tuned in an attempt to both improve the accu
 
 
 \subsection{Scikit-learn}
-Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, SVR, CatBoostRegressor, XGBRegressor, and DecisionTreeRegressor.
+Scikit-learn is another popular machine learning library where the typical use case is smaller datasets with feature extraction already having been performed. There are a multitude of regression models provided by Scikit-learn. The models that were analyzed in this test were RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, CatBoostRegressor, XGBRegressor, and DecisionTreeRegressor.
 
 Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best models had their performance compared using the same metrics. 
 
@@ -172,7 +172,7 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
 
 Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Table~\ref{comparing_sklearn} for a summary of the results. The table is sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the accuracy and $R^2$ closest to one, and the RMSE closest to zero. 
 
-It's clear by looking at the table that RandomForestRegressor is the best performing model. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. When comparing TensorFlow to Scikit-learn, this is the model that will be used. 
+It's clear by looking at the table that XGBRegressor and RandomForestRegressor are the best performing models. They have the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. When comparing TensorFlow to Scikit-learn, the RandomForestRegressor model will be used because the decision trees that it is based on are not sensitive to outliers, but XGBRegressor is~\cite{BROWN2009541,Li_2018}. 
 
 \begin{table}[h]
 \caption{Scikit-learn Results}
@@ -181,19 +181,17 @@ It's clear by looking at the table that RandomForestRegressor is the best perfor
     \hline
     Model Type & Accuracy within~$\pm$1dB & RMSE & $R^2$ \\ 
     \hline
-    RandomForestRegressor & 0.9301 & 0.7652 & 0.9620 \\
-    \hline  
-    DecisionTreeRegressor & 0.9080 & 1.0764 & 0.9248 \\  
+    XGBRegressor & 0.9410 & 0.7330 & 0.9651 \\  
     \hline
+    RandomForestRegressor & 0.9286 & 0.7717 & 0.9614 \\
+    \hline  
     GradientBoostingRegressor & 0.9012 & 0.9950 & 0.9357 \\
     \hline
     CatBoostRegressor & 0.8969 & 0.9949 & 0.9358 \\    
     \hline
-    XGBRegressor & 0.8942 & 1.0467 & 0.9289 \\  
+    DecisionTreeRegressor & 0.8808 & 1.1082 & 0.9202 \\  
     \hline
-    AdaBoostRegressor & 0.8526 & 1.1924 & 0.9077 \\  
-    \hline
-    SVR & 0.6717 & 2.7252 & 0.5180 \\  
+    AdaBoostRegressor & 0.8523 & 1.1956 & 0.9072 \\  
     \hline
 \end{tabular}
 \end{center}
