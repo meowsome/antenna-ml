@@ -120,6 +120,33 @@ Scikit-learn is another popular machine learning library where the typical use c
 
 Similarly to with TensorFlow, a randomized search was used to determine the best hyperparameters for each model's use case. Once the optimization was performed, all of the best models had their performance compared using the same metrics. 
 
+\subsection{Model Performance Analysis}
+A manual analysis was performed using a number of random unique antenna geometry configurations for the simpler patch antenna. The geometries selected have never been seen by the simulation, training set, or testing set. They then have both their simulated and predicted $S_{11}$ values for the entire frequency range from the HFSS and best chosen model compared. This process is done in order to narrow in on random samples of actual data to check that the model is performing comparably to the simulation software. The geometric parameters of the chosen unseen geometries are recorded in Table~\ref{unseen_geometries}.
+
+\begin{table}[h]
+\caption{Unseen Geometry Parameters}
+\begin{center}
+\begin{tabular}{ |l|p{0.12\linewidth}|l|p{0.12\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}| }
+    \hline
+    ID & inset\_dist [mm] & L [mm] & sub\_thick [mm] & W [mm] & W0 [mm] & y0 [mm] \\ 
+    \hline
+    1 & 0.6 & 11.5 & 2.0 & 14.8 & 2.5 & 4.25 \\
+    \hline
+    2 & 0.6 & 12.0 & 2.0 & 14.8 & 2.75 & 4.5 \\
+    \hline
+    3 & 1.0 & 12.0 & 2.0 & 15.6 & 3.5 & 4.25 \\
+    \hline
+    4 & 1.4 & 11.5 & 2.0 & 15.6 & 3.5 & 4.25 \\
+    \hline
+    5 & 1.4 & 11.5 & 2.0 & 15.4 & 3.5 & 4.5 \\
+    \hline
+    6 & 1.4 & 11.75 & 2.0 & 15.4 & 3.5 & 4.75 \\
+    \hline
+\end{tabular}
+\end{center}
+\label{unseen_geometries}
+\end{table}    
+
 \subsection{Finding Optimal Geometry}
 The flowchart in Figure~\ref{data_flow} gives a visual representation of how the data flows through the algorithm. All of the steps up until generating predictions are performed initially for any new antenna configuration that the model hasn't seen yet. The last few steps, starting at filtering rows, are performed every time a new optimal geometry is searched using a specified $S_{11}$ and frequency range. 
 
@@ -254,42 +281,16 @@ Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_lea
     \label{actual_vs_predicted_s11_leaky_wave}
 \end{Figure}
 
-\subsection{Testing with Completely Unseen Geometries}
-The chosen model was given a set of 6 random geometries from the patch antenna that had never been seen before by either the training set or testing set. These geometries were part of the permutations that were generated to create the dataset for optimal geometry searching. The geometric parameters of the chosen unseen geometries are recorded in Table~\ref{unseen_geometries}.
+\subsection{Testing with Unseen Geometries}
+The chosen model was given a set of six random geometries from the patch antenna that had never been seen before by either the training set or testing set. These geometries were part of the permutations that were generated to create the dataset for optimal geometry searching. 
 
 It's worth noting that each of the geometric parameters that were chosen for the unseen geometries lay within the range of the minimum and maximum value for each respective parameter. Due to the scaling that was performed during the preprocessing steps, any predictions made with geometric parameters that lay outside of the original range of the training data are capped as if the data point outside of the range was actually the corresponding minimum or maximum. Therefore, it didn't make sense to include any geometric parameters outside of the geometric parameters respective ranges. 
 
-\begin{table}[h]
-\caption{Unseen Geometry Parameters}
-\begin{center}
-\begin{tabular}{ |l|p{0.12\linewidth}|l|p{0.12\linewidth}|l|l|l| }
-    \hline
-    ID & inset\_dist [mm] & L [mm] & sub\_thick [mm] & W [mm] & W0 [mm] & y0 [mm] \\ 
-    \hline
-    1 & 0.6 & 11.5 & 2.0 & 14.8 & 2.5 & 4.25 \\
-    \hline
-    2 & 0.6 & 12.0 & 2.0 & 14.8 & 2.75 & 4.5 \\
-    \hline
-    3 & 1.0 & 12.0 & 2.0 & 15.6 & 3.5 & 4.25 \\
-    \hline
-    4 & 1.4 & 11.5 & 2.0 & 15.6 & 3.5 & 4.25 \\
-    \hline
-    5 & 1.4 & 11.5 & 2.0 & 15.4 & 3.5 & 4.5 \\
-    \hline
-    6 & 1.4 & 11.75 & 2.0 & 15.4 & 3.5 & 4.75 \\
-    \hline
-\end{tabular}
-\end{center}
-\label{unseen_geometries}
-\end{table}
-
-These unseen geometries were run through both the HFSS and the chosen machine learning model in order to obtain simulated and predicted $S_{11}$ values. This process was completed for the entire frequency range of the patch antenna. The results are shown in Figure~\ref{unseen_geometries_graph}, where each unseen geometry has its predicted $S_{11}$ values plotted alongside the simulated values for each frequency in the frequency range.
-
-TODO WRITE more and actually update graph once cameron gets back to me 
+These unseen geometries were run through both the HFSS and the chosen machine learning model in order to obtain simulated and predicted $S_{11}$ values. This process was completed for the entire frequency range of the patch antenna. The results are shown in Figure~\ref{unseen_geometries_graph}, where each unseen geometry has its simulated $S_{11}$ values plotted alongside the predicted values for each frequency in the frequency range. It's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values go. 
 
 \begin{Figure}
     \centering
-    \includegraphics[width=2.5in]{unseen_geometries_freq_vs_seq}
+    \includegraphics[width=3.25in]{unseen_geometries_freq_vs_seq}
     \captionof{figure}{Simulated \& Predicted $S_{11}$ Values for Frequency Range of Unseen Geometries}
     \label{unseen_geometries_graph}
 \end{Figure}
@@ -308,7 +309,7 @@ TODO replace image with something more high quality, find better example
 
 
 \section{Conclusion}
-Applying a machine learning algorithm as an aid in the process of optimizing  antenna geometric parameters with EM simulations greatly reduces the amount of time and computational power required. Training a model on a small set of data obtained from a parameteric sweep allows the model to fit to the trend of data. Large amounts of additional data can then be generated within the bounds of the existing data, and performance predictions can be made for this generated data with a high accuracy. The most optimal geometries can be returned for specified performance values and frequency ranges, making the trial-and-error process of finding these geometries by running simulations unnecessary. 
+Applying a machine learning algorithm as an aid in the process of optimizing antenna geometric parameters with EM simulations greatly reduces the amount of time and computational power required. Training a model on a small set of data obtained from a parameteric sweep allows the model to fit to the trend of data. Large amounts of additional data can then be generated within the bounds of the existing data, and performance predictions can be made for this generated data with a high accuracy. The most optimal geometries can be returned for specified performance values and frequency ranges, making the trial-and-error process of finding these geometries by running simulations unnecessary. 
 
 Using Scikit-learn regression models had better accuracy and lower training and testing times than a DNN built with TensorFlow. This is because the Scikit-learn models are simpler than a DNN and are more optimized for the task.  
 
