@@ -121,6 +121,8 @@ A manual analysis was performed using a number of random unique antenna geometry
 \subsection{Finding Optimal Geometry}
 The flowchart in Figure~\ref{data_flow} gives a visual representation of how the data flows through the algorithm. All of the steps up until generating predictions are performed initially for any new antenna configuration that the model hasn't seen yet. The last few steps, starting at filtering rows, are performed every time a new optimal geometry is searched using a specified $S_{11}$ and frequency range. 
 
+A GUI (graphical user interface) was created in order to make the process of filtering optimal geometries more intuitive. The GUI include an input area, where a user can input a desired $S_{11}$ and frequency range. Once these are entered, all of the combinations are filtered and the best performing optimal geometries are shown. A graph of frequency and predicted $S_{11}$ is also shown, where each optimal geometry is plotted. The desired $S_{11}$ and frequency range are also represented on the graph so it's clear what area of the graph is being focused on.
+
 \begin{Figure}
 \centering
 \includegraphics[width=2.25in]{methodology}
@@ -128,7 +130,11 @@ The flowchart in Figure~\ref{data_flow} gives a visual representation of how the
 \label{data_flow}
 \end{Figure}
 
-A GUI (graphical user interface) was created in order to make the process of filtering optimal geometries more intuitive. The GUI include an input area, where a user can input a desired $S_{11}$ and frequency range. Once these are entered, all of the combinations are filtered and the best performing optimal geometries are shown. A graph of frequency and predicted $S_{11}$ is also shown, where each optimal geometry is plotted. The desired $S_{11}$ and frequency range are also represented on the graph so it's clear what area of the graph is being focused on.
+
+\subsection{Explainability}
+SHAP, an open-source game theoretic approach to explainable AI, is used to demonstrate how much each geometric parameter swayed the predicted $S_{11}$ value~\cite{NIPS2017_7062}. Beeswarm plots are used to enhance understanding of the relationship between the geometric parameters and the $S_{11}$ values by showing which parameters have the highest impact on the prediction being made for the model as a whole and in which way they are swaying the prediction. 
+
+TODO WRITE MORE
 
 
 \section{Results}
@@ -225,6 +231,20 @@ An example of an input and the corresponding graph that is generated is shown in
 \end{center}
 \label{gui_geometries}
 \end{table}    
+
+\subsection{SHAP}
+In order to feasibly use SHAP with the patch antenna dataset, the second choice of model, XGBRegressor, had to be used. This is because it was estimated to take many hours to run SHAP's TreeEstimator, where running a regular Estimator on something such as an XGBRegressor took only 406.5 seconds.
+
+Figure~\ref{shap_beeswarm} shows how frequency has the a significantly higher impact on $S_{11}$ predictions than any geometric feature, and this makes sense when considering that the $S_{11}$ value heavily depends on what the frequency is. All of the geometric features are similar in how much they weigh the model, with $y0$ having the highest impact. $y0$, $W$, and $W0$ seem to tend to strongly drive the predictions lower, where $L$ and $inset\_dist$ seem to make predictions go both ways. It makes sense that $sub\_thick$ appears to have zero impact on the model, because in the patch antenna dataset, it is always the same value for every combination of geometry. 
+
+TODO replace this figure, write more about results
+
+\begin{Figure}
+\centering
+\includegraphics[width=3in]{shap_beeswarm}
+\captionof{figure}{Beeswarm Plot of Features Impacting Predictions}
+\label{shap_beeswarm}
+\end{Figure}
     
 
 \section{Conclusion}
