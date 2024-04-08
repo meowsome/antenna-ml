@@ -2,7 +2,8 @@ pandas
 shap
 scikit-learn==1.3.1
 numpy
-ipywidgets
+ipywidgets==7.7.1
 matplotlib
 nbformat>=4.2.0
 plotly
+xgboost==2.0.3
