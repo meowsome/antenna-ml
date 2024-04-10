@@ -24,3 +24,4 @@ research/untitled_project/*
 *.pkl
 research/*.png
 /*.png
+*.db
