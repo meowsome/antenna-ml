@@ -44,7 +44,7 @@ martc114@my.erau.edu}
 Daytona Beach, Florida \\
 rojase1@erau.edu}
 \and
-\IEEEauthorblockN{Dr. M. Ilhan Akbas}
+\IEEEauthorblockN{Dr. M. \.{I}lhan Akba\c{s}}
 \IEEEauthorblockA{\textit{WiDE Laboratory} \\
 \textit{Embry-Riddle Aeronautical University}\\
 Daytona Beach, Florida \\
@@ -280,17 +280,13 @@ A manual analysis was performed using a number of random unique antenna geometry
 \end{table}    
     
 
-\subsection{Finding Optimal Geometry}
-The flowchart in Figure~\ref{data_flow} gives a visual representation of how the data flows through the algorithm. All of the steps up until generating predictions are performed initially for any new antenna configuration that the model hasn't seen yet. The last few steps, starting at filtering rows, are performed every time a new optimal geometry is searched using a specified $S_{11}$ and frequency range. 
 
-\begin{Figure}
-\centering
-\includegraphics[width=3.0in]{methodology}
-\captionof{figure}{Flow of data through the system}
-\label{data_flow}
-\end{Figure}
 
-A GUI (graphical user interface) was created in order to make the process of filtering optimal geometries more intuitive. The GUI include an input area, where a user can input a desired $S_{11}$ and frequency range. Once these are entered, all of the permutations are filtered and the best performing optimal geometries are shown. A graph of frequency and predicted $S_{11}$ is also shown, where each optimal geometry is plotted. The desired $S_{11}$ and frequency range are also represented on the graph so it's clear what area of the graph is being focused on.
+\subsection{Explainability}
+SHAP, an open-source game theoretic approach to XAI, is used to demonstrate how much each geometric parameter swayed the predicted $S_{11}$ value~\cite{NIPS2017_7062}. Beeswarm plots are used to enhance understanding of the relationship between the geometric parameters and the $S_{11}$ values by showing which parameters have the highest impact on the prediction being made for the model as a whole, and in which way they are swaying the prediction. By determining which features have the highest impact on the predictions, certain features can be singled out to focus on when performing additional simulations, improving the model by training it on additional data while minimizing the amount of data that needs to be simulated by intelligently selecting parameters. Waterfall plots can also be created for individual predictions to analyze the highest contributing features to that particular prediction.
+
+\subsection{Manufacturing Antenna}
+After performing all of the above steps, the GUI that was created was used to pick a potential antenna geometry for a desired $S_{11}$ and operational frequency range using the predictions that were generated. The geometry was chosen before the additional training was performed using the knowledge of the best parameters from XAI. The geometry was then run through HFSS, and the performance across the frequency range was compared between the simulated, values, the predicted values, and the actual measured values. 
 
 
 \section{Results}
@@ -329,9 +325,16 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
     \label{dnn_loss_graph}
 \end{Figure}
 
-Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Tables~\ref{comparing_sklearn_p} and~\ref{comparing_sklearn_lw} for a summary of the results. The tables are sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the accuracy and $R^2$ closest to one, and the RMSE closest to zero. 
+Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores. Please see Tables~\ref{comparing_sklearn_p} and~\ref{comparing_sklearn_lw} for a summary of the results. The tables are sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the accuracy and $R^2$ closest to one, and the RMSE closest to zero. It's clear by looking at the tables that XGBRegressor is the best performing model for both antennas. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. 
 
-It's clear by looking at the tables that XGBRegressor is the best performing model for both antennas. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. 
+\begin{Figure}
+    \centering
+    \includegraphics[width=2.5in]{images/learningcurve1.png}
+    \captionof{figure}{XGBRegressor Learning Curve}
+    \label{learning_curve}
+\end{Figure}
+
+The learning curve in Figure~\ref{learning_curve} demonstrates the tradeoff between variance and bias when training the machine learning model. The learning curve shows that the RMSE decreases significantly as more training data is added to the model, which means that the model is fitting to the data. However, because the validation and the training sets never converge and have a large distance between them, our model has high variance. This means that the model is being given too many features when compared to the amount of rows of training data available. This can be fixed by adding more training data.
 
 
 \begin{table}[h]
@@ -461,10 +464,6 @@ Figures~\ref{histogram_of_error_leaky_wave} and~\ref{actual_vs_predicted_s11_lea
 \subsection{Testing with Unseen Geometries}
 For each antenna, the chosen model was given a set of six randomly selected geometries that had never been seen before by either the training set or testing set. These geometries were part of the combinations that were generated to create the dataset for optimal geometry searching, so they have also never been seen by the simulator. These unseen geometries were run through both the HFSS and the chosen machine learning model in order to obtain simulated and predicted $S_{11}$ values for the entire frequency range of the antenna. The results are shown in Figure~\ref{unseen_geometries_graph_p} and~\ref{unseen_geometries_lw}, for the MPA and the LWA respecitvely. In this figure, each unseen geometry has its simulated $S_{11}$ values plotted alongside the predicted values for each frequency in the frequency range.
 
-For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values go. 
-
-While the predicted $S_{11}$ values for the LWA are obviously not extremely accurate when compared to the simulated values, it can be observed that they follow the same general trend. There are certain areas where the predictions perform very well, particularly in Geometry 1 between 10 and 15 GHz, Geometry 2 between 18.5 and 19.5 GHz, and Geometry 5 between 13 and 17 GHz. For Geometries 1, 4, and 5, the predicted value appears to rise above zero, which should theoretically never happen. With more training data included from more simulations, the predictions will slowly become more fit to the simulated values. 
-
 
 \begin{Figure}
     \centering
@@ -480,49 +479,9 @@ While the predicted $S_{11}$ values for the LWA are obviously not extremely accu
     \label{unseen_geometries_graph_lw}
 \end{Figure}
 
+For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values go. 
 
-\subsection{Finding Optimal Geometry}
-A graphical user interface (GUI) was implemented using Jupyter Widgets to allow for ease of exploring different types of geometries~\cite{interactive_Jupyter_widgets}. This was implemented specifically for exploring the geometries of the LWA, but could be adapted to use with other antenna designs, such as the MPA. A user inputs a desired $S_{11}$ value and frequency range, and a graph showing predicted $S_{11}$ values for the frequency range will be plotted for the best performing geometries. This graph includes marker lines as a visual aid to show what value the $S_{11}$ predictions should be below and what frequency values the predictions should be between. The GUI allows the user to interactively explore which geometric parameters lead to a specified performance, where before this was a manual and timely process.  
-
-
-An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -25dB is represented by the dotted horizontal blue line, and the selected frequency range between 12.81GHz and 13.03GHz is represented by the two dotted vertical green lines. All of the 4 geometries that are found have predicted $S_{11}$ values within these constraints. Table~\ref{gui_geometries} shows the 4 optimal geometries that are represented in Figure~\ref{gui}. The geometries that are best for this criteria have a $feed\_l$ of 3.75mm and a $patch\_l$ of 4.0mm. The rest of the geometric parameters vary. 
-
-\begin{Figure}
-    \centering
-    \includegraphics[width=2in]{gui_input}
-    \includegraphics[width=3in]{gui_graph}
-    \captionof{figure}{GUI Input and Predicted $S_{11}$ vs Frequency for Optimal Geometries}
-    \label{gui}
-\end{Figure}
-
-\begin{table}[h]
-\caption{Geometries Generated from GUI}
-\begin{center}
-\begin{tabular}{ 
-|p{1.75cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|}
-    \hline
-    ID & 17505219 & 17528247 & 17528348 & 17535822 & 17543397 \\
-    \hline
-    cpw\_in [mm] & 2.00 & 2.00 & 2.00 & 2.00 & 2.00 \\
-    \hline
-    feed\_l [mm] & 4.00 & 4.00 & 4.00 & 4.00 & 4.00 \\
-    \hline
-    patch\_l [mm] & 3.50 & 3.50 & 3.50 & 3.50 & 3.50 \\
-    \hline
-    cpw\_g [mm] & 0.18 & 0.18 & 0.18 & 0.18 & 0.18 \\
-    \hline
-    Feed\_W [mm] & 1.00 & 1.25 & 1.25 & 1.50 & 1.75 \\
-    \hline
-    ground\_w [mm] & 1.50 & 1.50 & 1.50 & 1.50 & 1.50 \\
-    \hline
-    patch\_ground\_w [mm] & 1.25 & 1.50 & 1.50 & 1.50 & 1.50 \\
-    \hline
-    patch\_w [mm] & 4.75 & 4.75 & 4.50 & 4.75 & 4.75 \\
-    \hline
-\end{tabular}
-\end{center}
-\label{gui_geometries}
-\end{table} 
+While the predicted $S_{11}$ values for the LWA are obviously not extremely accurate when compared to the simulated values, it can be observed that they follow the same general trend. There are certain areas where the predictions perform very well, particularly in Geometry 1 between 10 and 15 GHz, Geometry 2 between 18.5 and 19.5 GHz, and Geometry 5 between 13 and 17 GHz. For Geometries 1, 4, and 5, the predicted value appears to rise above zero, which should theoretically never happen. With more training data included from more simulations, the predictions will slowly become more fit to the simulated values. 
 
 
 \subsection{SHAP}
@@ -538,11 +497,70 @@ In order to feasibly use SHAP with the LWA dataset, a random sample of 5,000 poi
 
 Figure~\ref{shap_beeswarm} is a SHAP beeswarm plot, which demonstrates the impact that each feature had on the predictions made by the model overall for the LWA. The figure shows how frequency had a significantly higher impact on $S_{11}$ predictions than any geometric feature, which makes sense because antennas have an entirely different performance depending on what frequency is used. The other geometric parameters appear to have similar impacts on the predictions being made. $feed\_l$, $ground\_l$, and $Feed\_W$ all consistently had higher values of these features causing lower predictions to be made, and lower values causing higher predictions. The opposite was true for $cpw\_in$. For $cpw\_g$, high feature values caused both high and low predictions, but lower feature values caused the prediction to stay relatively the same. None of the other features had this strong of a correlation. 
 
-From these observations, two geometric parameters were chosen as the most impactful parameters. $cpw\_g$ was chosen because it has a really wide spread with some SHAP values reaching as far as -10. Secondly, $cpw\_in$ was chosen because it has a cluster that occurs the furthest away from zero. 77 more unique geometries were simulated across the frequency range, and when combined with the original 233, the accuracy increased from 0.6271 to a significantly better 0.7343. That's an accuracy increase of over 10\% that was attributed to only 77 additional geometry simulations. In addition, the RMSE and $R^2$ scores improved, with the new scores being 2.319 and 0.8336. If this process were to be repeated one or two more times, an improvement across all of the metrics is likely to be seen. ginal 
+From these observations, two geometric parameters were chosen as the most impactful parameters. $cpw\_g$ has a wide spread with some SHAP values reaching as far as -10, and $cpw\_in$ has a cluster that occurs the furthest away from zero. 77 more unique geometries were simulated across the frequency range, and when combined with the original 233, the accuracy increased from 0.6271 to a significantly better 0.7343. That's an accuracy increase of over 10\% that was attributed to only 77 additional geometry simulations. In addition, the RMSE and $R^2$ scores improved, with the new scores being 2.319 and 0.8336. If this process were to be repeated one or two more times, an improvement across all of the metrics is likely to be seen. 
+
+
+\subsection{Finding Optimal Geometry}
+A graphical user interface (GUI) was implemented using Jupyter Widgets to allow for ease of exploring different types of geometries~\cite{interactive_Jupyter_widgets}. This was implemented specifically for exploring the geometries of the LWA, but could be adapted to use with other antenna designs, such as the MPA. A user inputs a desired $S_{11}$ value and frequency range, and a graph showing predicted $S_{11}$ values for the frequency range will be plotted for the best performing geometries. This graph includes marker lines as a visual aid to show what value the $S_{11}$ predictions should be below and what frequency values the predictions should be between. The GUI allows the user to interactively explore which geometric parameters lead to a specified performance, where before this was a manual and timely process.  
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2in]{gui_input}
+    \includegraphics[width=3in]{gui_graph}
+    \captionof{figure}{GUI Input and Predicted $S_{11}$ vs Frequency for Optimal Geometries}
+    \label{gui}
+\end{Figure}
+
+An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -25dB is represented by the dotted horizontal blue line, and the selected frequency range between 12.81GHz and 13.03GHz is represented by the two dotted vertical green lines. All of the 4 geometries that are found have predicted $S_{11}$ values within these constraints. 
+
+\begin{table}[h]
+\caption{Manufactured LWA Geometries}
+\begin{center}
+\begin{tabular}{ 
+|l|l|l|}
+    \hline
+    Geometry Name & 1 & 2 \\
+    \hline
+    cpw\_in [mm] & 2.0 & 1.8 \\
+    \hline
+    feed\_l [mm] & 4.0 & 3.75 \\
+    \hline
+    patch\_l [mm] & 3.5 & 3.75 \\
+    \hline
+    cpw\_g [mm] & 0.18 & 0.24 \\
+    \hline
+    Feed\_W [mm] & 2.0 & 2.0 \\
+    \hline
+    ground\_w [mm] & 1.5 & 0.75 \\
+    \hline
+    patch\_ground\_w [mm] & 1.25 & 1.25 \\
+    \hline
+    patch\_w [mm] & 4.5 & 5.0 \\
+    \hline
+\end{tabular}
+\end{center}
+\label{manufactured_geometries_list}
+\end{table}
+
+After some analysis using the GUI, two geometries from the LWA antenna were chosen to manufacture that met slightly different constraints, which are summarized in Table~\ref{manufactured_geometries_list}. The first antenna was selected before training the ML model on the additional data after performing the XAI analysis, and the second antenna was selected after. If the predictions were accurate, these antennas would perform very well within the desired constrains. Figure~\ref{manufactured_antenna_pic} shows what the first manufactured antenna looks like, and Figure~\ref{manufactured_antenna_performance} shows how the performance compared between the simulated, predicted, and actual measured $S_{11}$ values for each antenna. For the first manufactured antenna, the predictions seem to very closely follow the simulated values, with only slight variations. The second antenna has a less accurate prediction that fails to predict important antenna characteristics, such as the dip to -40 dB near 19.5 GHz. However, the simulated values proves that the predictions work well, since the antenna meets the original criteria of performing below -11.5 dB between 12.5 and 17 GHz.
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=2in]{manufactured_antenna}
+    \captionof{figure}{Picture of Manufactured LWA}
+    \label{manufactured_antenna_pic}
+\end{Figure} 
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=3.5in]{manufactured_antenna_performance}
+    \captionof{figure}{Manufactured LWA Performance}
+    \label{manufactured_antenna_performance}
+\end{Figure} 
 
 
 \section{Conclusion}
-Applying a machine learning algorithm as an aid in the process of optimizing antenna geometric parameters with EM simulations greatly reduces the amount of time and computational power required. Training a model on a small set of data obtained from running simulation software allows the model to fit to the trend of data. Large amounts of additional data can then be generated within the bounds of the existing data, and performance predictions can be made for this generated data with a decent accuracy. The most optimal geometries can be returned for specified performance values and frequency ranges, making the traditional way of relying on intuition and trial-and-error in order to determine which antenna geometries would allow for the best performance. Additionally, open-source XAI libraries can then be applied to the model to allow for further analysis of the contribution each geometric feature makes to the predictions. After careful analysis of the weight that each parameter has on the overall model predictions, the most impactful parameters can be singled out to run more simulations on. This will drive the accuracy even higher with the most minimal amount of simulations. 
+Applying a machine learning algorithm as an aid in the process of optimizing antenna geometric parameters with EM simulations greatly reduces the amount of time and computational power required. Training a model on a small set of data obtained from running simulation software allows the model to fit to the trend of data. Large amounts of additional data can then be generated within the bounds of the existing data, and performance predictions can be made for this generated data with a decent accuracy. The most optimal geometries can be returned for specified performance values and frequency ranges, making the traditional way of relying on intuition and trial-and-error in order to determine which antenna geometries would allow for the best performance. Additionally, open-source XAI libraries can then be applied to the model to allow for further analysis of the contribution each geometric feature makes to the predictions. After careful analysis of the weight that each parameter has on the overall model predictions, the most impactful parameters can be singled out to generate more simulations, which will be added to the ML model's training data. This will drive the accuracy even higher with the most minimal amount of simulations. 
 
 
 \bibliographystyle{IEEEtran}
