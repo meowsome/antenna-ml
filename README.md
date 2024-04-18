@@ -20,12 +20,18 @@ Antenna design processes require extensive electromagnetic (EM) simulation tasks
 6. Scroll to bottom
 
 
-### Process for adding a new antenna
+### Process for adding a new antenna type
 1. Create new folder in [test_data](test_data), add CSV files to folder
-2. Modify [training_leaky_wave_new.ipynb](training/training_leaky_wave_new.ipynb) or duplicate file to reference new CSV file, then run to generate `antenna_model.pkl`
-3. Move generated `antenna_model.pkl` file to main directory
-4. Modify [generate_all_predictions.ipynb](research/generate_all_predictions.ipynb) or duplicate file to reference new CSV file, then run to generate [test_data/lw.db](test_data/lw.db)
-5. Modify [get_dimensions_from_s11.ipynb](get_dimensions_from_s11.ipynb) to reference new CSV, and change SQL query to include the geometric parameters from new antenna
+2. Modify [research/compare_models_lwn.ipynb](research/compare_models_lwn.ipynb) or duplicate file to reference new CSV file.
+3. Run all cells of file to tune hyperparameters and compare models.
+4. Take note of best performing ML model and its hyperparameters
+5. Modify [training/training_leaky_wave_new.ipynb](training/training_leaky_wave_new.ipynb) or duplicate file to reference new CSV file.
+6. Change model and hyperparameters in this file to the best performing one from the last step.
+7. Then run all cells to generate `antenna_model.pkl`
+8. Move generated `antenna_model.pkl` file to main directory
+9. Modify [research/generate_all_predictions.ipynb](research/generate_all_predictions.ipynb) or duplicate file to reference new CSV file, then run to generate [test_data/lw.db](test_data/lw.db)
+10. Modify [get_dimensions_from_s11.ipynb](get_dimensions_from_s11.ipynb) to reference new CSV
+11. Change the SQL query in this file to include the geometric parameters from new antenna
 
 
 ### GUI Usage Instructions
@@ -63,7 +69,15 @@ Antenna design processes require extensive electromagnetic (EM) simulation tasks
 | [research/sql_test.ipynb](research/sql_test.ipynb) | Experimenting with interfacing with SQLite using SQL query |
 | [research/unseen_rows.ipynb](research/unseen_rows.ipynb) | Generate sample of random "unseen" geometries |
 
+---
 
 ### Common Issues
 - If you have trouble getting Plotly to display inside VScode, try this fix https://stackoverflow.com/a/68718345/3675086
 - If VScode keeps crashing or freezing when experimenting with the GUI, please limit the amount of geometries that are plotted manually or by changing your search query
+
+
+### Future Ideas
+- Instead of only showing the top best geometry in GUI, try showing top top `n` best geometries, so the user has some alternatives to look at 
+- Improve speed ot SQLite queries, they take about 3-4 mins right now 
+- Change from using Jupyter Widgets to an actual website? 
+- Make a streamlined way for an antenna designer who might not know how to code to add a new antenna type
