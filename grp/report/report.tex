@@ -54,7 +54,7 @@ akbasm@erau.edu}
 \maketitle
 
 \begin{abstract}
-    Antenna design processes require extensive electromagnetic (EM) simulation tasks that are resource-intensive, time-consuming, and prone to interruptions. Design equations are only available for predefined and limited antenna geometries. By applying a machine learning (ML) model to a limited set of data from EM simulations of a microstrip patch antenna (MPA) and leaky wave antenna (LWA), performance metrics can be predicted significantly quicker than running simulations for an extensive range of geometric variations. The model can be used for inverse design techniques, where the performance requirements are provided as input, and the model generates a geometric solution that meets those requirements. XGBRegressor was found to be the best performing model for both antenna types, with accuracies of 94.10\% and 62.71\% respectively. Explainable ML (XAI) processes can also be applied to identify the most impactful geometric parameters, and additional simulations focusing on those parameters can be performed, creating an iterative process of intelligently generating a minimal amount of data to improve model performance This process was tested on the LWA, which saw an accuracy increase from 62.71\% to 73.43\% using XAI. 
+    Antenna design processes require extensive electromagnetic (EM) simulation tasks that are resource-intensive, time-consuming, and prone to interruptions. Design equations are only available for predefined and limited antenna geometries. By applying a machine learning (ML) model to a limited set of data from EM simulations of a microstrip patch antenna (MPA) and leaky wave antenna (LWA), performance metrics can be predicted significantly quicker than running simulations for an extensive range of geometric variations. The model can be used for inverse design techniques, where the performance requirements are provided as input, and the model generates a geometric solution that meets those requirements. XGBRegressor was found to be the best performing model for both antenna types, with accuracies of 94.10\% and 62.71\% respectively. Explainable ML (XAI) processes can also be applied to identify the most impactful geometric parameters, and additional simulations focusing on those parameters can be performed, creating an iterative process of intelligently generating a minimal amount of data to improve model performance. This process was tested on the LWA, which saw an accuracy increase from 62.71\% to 73.43\% using XAI. 
 \end{abstract}
 
 \section{Introduction}
@@ -513,7 +513,7 @@ A GUI was implemented using Jupyter Widgets to allow for ease of exploring diffe
     \label{gui}
 \end{Figure}
 
-An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -25 dB is represented by the dotted horizontal blue line, and the selected frequency range between 12.81 GHz and 13.03 GHz is represented by the two dotted vertical green lines. All of the 4 geometries that are found have predicted $S_{11}$ values within these constraints. 
+An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -13 dB is represented by the dotted horizontal blue line, and the selected frequency range between 12 GHz and 14 GHz is represented by the two dotted vertical green lines. All of the geometries that are found have predicted $S_{11}$ values within these constraints. 
 
 \begin{table}[h]
 \caption{Manufactured LWA Geometries}
