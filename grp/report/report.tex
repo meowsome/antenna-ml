@@ -283,7 +283,7 @@ After the best library is determined and the best model is chosen from that libr
 
 
 \subsection{Explainability}
-SHAP, an open-source game theoretic approach to XAI, is used to demonstrate how much each geometric parameter swayed the predicted $S_{11}$ value~\cite{NIPS2017_7062}. Beeswarm plots are used to enhance understanding of the relationship between the geometric parameters and the $S_{11}$ values by showing which parameters have the highest impact on the prediction being made for the model as a whole, and in which way they are swaying the prediction. By determining which geometric features have the highest impact on the predictions, additional simulations can be simulated by focusing on these features to minimize the amount of data that needs to be simulated. Waterfall plots can also be created for individual predictions to analyze the highest contributing features to that particular prediction.
+SHAP, an open-source game theoretic approach to XAI, is used to demonstrate how much each geometric parameter swayed the predicted $S_{11}$ value~\cite{NIPS2017_7062}. Beeswarm plots are used to enhance understanding of the relationship between the geometric parameters and the $S_{11}$ values by showing which parameters have the highest impact on the prediction being made for the model as a whole, and in which way they are swaying the prediction. By determining which geometric features have the highest impact on the predictions, additional simulations can be simulated by focusing on these features to minimize the amount of data that needs to be simulated. 
 
 \subsection{Manufacturing Antenna}
 After performing all of the above steps, a graphical user interface (GUI) was created to allow a user to pick a potential antenna geometry for a desired $S_{11}$ and operational frequency range using the predictions that were generated. The geometry was chosen before the additional training was performed using the knowledge of the best parameters from XAI. The geometry was then run through HFSS, and the performance across the frequency range was compared between the simulated, values, the predicted values, and the actual measured values. 
@@ -319,8 +319,8 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
 
 \begin{Figure}
     \centering
-    \includegraphics[width=3in]{loss}
-    \includegraphics[width=3in]{loss_lw}
+    \includegraphics[width=2.5in]{loss}
+    \includegraphics[width=2.5in]{loss_lw}
     \captionof{figure}{DNN Loss Graph for MPA and LWA}
     \label{dnn_loss_graph}
 \end{Figure}
@@ -376,13 +376,20 @@ Each of the Scikit-learn regression models performed differently than one anothe
     \label{comparing_sklearn_lw}
     \end{table}
 
-The learning curve in Figure~\ref{learning_curve} demonstrates the tradeoff between variance and bias when training the ML model. The learning curve shows that the RMSE decreases significantly as more training data is added to the model, which means that the model is fitting to the data. However, because the validation and the training sets never converge and have a large distance between them, our model has high variance. This means that the model is being given too many features when compared to the amount of rows of training data available. This can be fixed by adding more training data, an idea which will be revisited in Section~\ref{sec:xai}.
+Learning curves were generated for both the MPA and LWA to demonstrate how the RMSE changed as the XGBRegressor ML model was trained on more data. These graphs show how the model gets better at making predictions as the number of instances used to train the model increases. Figure~\ref{learningcurve_mpa} shows the learning curve for the MPA, which is an ideal shape for a learning curve. The training set has relatively low error, and the validation set's error decreases over time. The two lines begin to converge, but still have a bit of gap between them, which means that the model would likely benefit from more training data. Figure~\ref{learningcurve_lwa} shows the same graph for the LWA, but the results are not as good. Just like for the MPA, the validation for the LWA decreases as more training data is added to the model, which means that the model is fitting to the data. However, because the validation and the training sets never converge and have a large distance between them, this model has high variance. This means that the model is being given too many features when compared to the amount of rows of training data available. This can be fixed by adding more training data, an idea which will be revisited in Section~\ref{sec:xai}.
 
 \begin{Figure}
     \centering
-    \includegraphics[width=2.5in]{images/learningcurve1.png}
+    \includegraphics[width=3in]{learningcurve_mpa}
+    \captionof{figure}{XGBRegressor Learning Curve for MPA}
+    \label{learningcurve_mpa}
+\end{Figure}
+
+\begin{Figure}
+    \centering
+    \includegraphics[width=3in]{learningcurve_lwa}
     \captionof{figure}{XGBRegressor Learning Curve for LWA}
-    \label{learning_curve}
+    \label{learningcurve_lwa}
 \end{Figure}
 
 
@@ -473,6 +480,9 @@ For each antenna, the chosen model was given a set of six randomly selected geom
     \label{unseen_geometries_graph_p}
 \end{Figure}
 
+
+For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values reach. 
+
 \begin{Figure}
     \centering
     \includegraphics[width=3.25in]{unseen_geometries_freq_vs_seq_lw}
@@ -480,14 +490,14 @@ For each antenna, the chosen model was given a set of six randomly selected geom
     \label{unseen_geometries_graph_lw}
 \end{Figure}
 
-For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values reach. 
-
 While the predicted $S_{11}$ values for the LWA are obviously not nearly as accurate when compared to the simulated values, it can be observed that they follow the same general trend. There are certain areas where the predictions perform very well, particularly in Geometry 1 between 10 and 15 GHz, Geometry 2 between 18.5 and 19.5 GHz, and Geometry 5 between 13 and 17 GHz. For Geometries 1, 4, and 5, the predicted value appears to rise above zero, which should theoretically never happen. With more training data included from more simulations, the predictions will slowly become more fit to the simulated values. 
 
 
 \subsection{SHAP}
 \label{sec:xai}
 SHAP was applied to the model as an XAI analysis tool. In order to feasibly use SHAP with the LWA dataset, a random sample of 5,000 points was used. This sample consisted of all of the geometric parameters and the frequency, and accurately captures characteristics and trends present of the entire dataset. The best performing model, which was XGBRegressor, was used with scaled data in order to interface with the SHAP primary explainer. 
+
+Figure~\ref{shap_beeswarm} is a SHAP beeswarm plot, which demonstrates the impact that each feature had on the predictions made by the model overall for the LWA. The figure shows how frequency had a significantly higher impact on $S_{11}$ predictions than any geometric feature, which makes sense because antennas have an entirely different performance depending on what frequency is used. The other geometric parameters appear to have similar impacts on the predictions being made. $feed\_l$, $ground\_l$, and $Feed\_W$ all consistently had higher values of these features causing lower predictions to be made, and lower values causing higher predictions. The opposite was true for $cpw\_in$. For $cpw\_g$, high feature values caused both high and low predictions, but lower feature values caused the prediction to stay relatively the same. All of the other features seemed to be random and didn't have any correlation. 
 
     
 \begin{Figure}
@@ -497,13 +507,13 @@ SHAP was applied to the model as an XAI analysis tool. In order to feasibly use 
 \label{shap_beeswarm}
 \end{Figure}
 
-Figure~\ref{shap_beeswarm} is a SHAP beeswarm plot, which demonstrates the impact that each feature had on the predictions made by the model overall for the LWA. The figure shows how frequency had a significantly higher impact on $S_{11}$ predictions than any geometric feature, which makes sense because antennas have an entirely different performance depending on what frequency is used. The other geometric parameters appear to have similar impacts on the predictions being made. $feed\_l$, $ground\_l$, and $Feed\_W$ all consistently had higher values of these features causing lower predictions to be made, and lower values causing higher predictions. The opposite was true for $cpw\_in$. For $cpw\_g$, high feature values caused both high and low predictions, but lower feature values caused the prediction to stay relatively the same. All of the other features seemed to be random and didn't have any correlation. 
-
 From these observations, two geometric parameters were chosen as the most impactful parameters. $cpw\_g$ has a wide spread with some SHAP values reaching as far as -10, and $cpw\_in$ has a cluster that occurs the furthest away from zero. 77 more unique geometries were simulated across the frequency range, and when combined with the original 233, the accuracy increased from 0.6271 to a significantly better 0.7343. That's an accuracy increase of over 10\% that was attributed to only 77 additional geometry simulations. In addition, the RMSE and $R^2$ scores improved, with the new scores being 2.319 and 0.8336. If this process were to be repeated one or two more times, an improvement across all of the metrics is likely to be seen. 
 
 
 \subsection{Finding Optimal Geometry}
-A GUI was implemented using Jupyter Widgets to allow for ease of exploring different types of geometries~\cite{interactive_Jupyter_widgets}. This was implemented specifically for exploring the geometries of the LWA, but could be adapted to use with other antenna designs, such as the MPA. A user inputs a desired $S_{11}$ value and frequency range, and a graph showing predicted $S_{11}$ values for the frequency range will be plotted for the best performing geometries. This graph includes marker lines as a visual aid to show what value the $S_{11}$ predictions should be below and what frequency values the predictions should be between. The GUI allows the user to interactively explore which geometric parameters lead to a specified performance, where before this was a manual and timely process.  
+A GUI was implemented using Jupyter Widgets to allow for ease of exploring different types of geometries~\cite{interactive_Jupyter_widgets}. This was implemented specifically for exploring the geometries of the LWA, but could be adapted to use with other antenna designs, such as the MPA. A user inputs a desired $S_{11}$ value and frequency range, and a graph showing predicted $S_{11}$ values for the frequency range will be plotted for the best performing geometries. This graph includes marker lines as a visual aid to show what value the $S_{11}$ predictions should be below and what frequency values the predictions should be between. The GUI allows the user to interactively explore which geometric parameters lead to a specified performance, where before this was a manual and timely process. 
+
+An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -13 dB is represented by the dotted horizontal blue line, and the selected frequency range between 12 GHz and 14 GHz is represented by the two dotted vertical green lines. All of the geometries that are found have predicted $S_{11}$ values within these constraints.  
 
 \begin{Figure}
     \centering
@@ -512,8 +522,6 @@ A GUI was implemented using Jupyter Widgets to allow for ease of exploring diffe
     \captionof{figure}{GUI Input and Predicted $S_{11}$ vs Frequency for Optimal Geometries}
     \label{gui}
 \end{Figure}
-
-An example of an input and the corresponding graph that is generated is shown in Figure~\ref{gui}. The specified $S_{11}$ value of -13 dB is represented by the dotted horizontal blue line, and the selected frequency range between 12 GHz and 14 GHz is represented by the two dotted vertical green lines. All of the geometries that are found have predicted $S_{11}$ values within these constraints. 
 
 \begin{table}[h]
 \caption{Manufactured LWA Geometries}
@@ -546,7 +554,7 @@ An example of an input and the corresponding graph that is generated is shown in
 
 \begin{Figure}
     \centering
-    \includegraphics[width=2in]{manufactured_antenna}
+    \includegraphics[width=2.5in]{manufactured_antenna}
     \captionof{figure}{Picture of Manufactured LWA}
     \label{manufactured_antenna_pic}
 \end{Figure} 
