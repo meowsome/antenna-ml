@@ -108,7 +108,7 @@ Traditionally, the design and analysis of antennas relied on theoretical models 
 
 One important way to evaluate antenna performance is through its scattering parameters (S-parameters), specifically its $S_{11}$. This is known as the reflection coefficient or return loss, and represents the ratio of input power to reflected power, typically expressed in decibels (dB). For passive systems, this value is always negative. A return loss of less than -10 dB demonstrates a high level of impedance matching for an antenna, and is crucial for optimizing antenna performance in terms of signal strength, bandwidth, and radiation efficiency. 
 
-By changing the main antenna design parameters, a new geometry is created, which generates a new $S_{11}$ response. These $S_{11}$ values were specific to each geometry, and along with the parameters of that geometry, were compiled into a dataset which was then used for training and validating the ML model. Both the MPA and the LWA were put through this process. The MPA was used to prove that the process works well with a simple antenna design, and the ML model should be expected to work with very high accuracy with this antenna design. The LWA was used to test the method on a more advanced antenna design, and it is difficult to estimate what the accuracy score of the ML model will be with this antenna design. The dataset of the MPA consists of 40,905 rows, which was comprised of 405 unique geometries with $S_{11}$ values simulated across 101 frequency range values between 4GHz and 12GHz. Similarly, the dataset of the LWA consists of 23,735 rows, which was comprised of 233 unique geometries with $S_{11}$ values simulated across 101 frequency range values between 11GHz and 20GHz. Tables~\ref{antenna_dataset_p} and~\ref{antenna_design_lw} describe the relationship between the data.
+By changing the main antenna design parameters, a new geometry is created, which generates a new $S_{11}$ response. These $S_{11}$ values were specific to each geometry, and along with the parameters of that geometry, were compiled into a dataset which was then used for training and validating the ML model. Both the MPA and the LWA were put through this process. The MPA was used to prove that the process works well with a simple antenna design, and the ML model should be expected to work with very high accuracy with this antenna design. The LWA was used to test the method on a more advanced antenna design, and it is difficult to estimate what the accuracy score of the ML model will be with this antenna design. The dataset of the MPA consists of 40,905 rows, which was comprised of 405 unique geometries with $S_{11}$ values simulated across 101 frequency range values between 4 GHz and 12 GHz. Similarly, the dataset of the LWA consists of 23,735 rows, which was comprised of 233 unique geometries with $S_{11}$ values simulated across 101 frequency range values between 11 GHz and 20 GHz. Tables~\ref{antenna_dataset_p} and~\ref{antenna_design_lw} describe the relationship between the data.
 
 \begin{table}[h]
 \caption{MPA Dataset}
@@ -293,7 +293,7 @@ After performing all of the above steps, a graphical user interface (GUI) was cr
 \subsection{Library and Model Comparison with the MPA}
 Both antennas were used to test and compare the performance of models from the two different libraries: TensorFlow and Scikit-learn. The best performing model was chosen from each library, and their training time, predicting time, accuracy, and RMSE were compared in order to select the best model.
 
-The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. This was tested for both the MPA and the LWA. The MPA was found to work best with a smaller DNN consisting of two layers, where the LWA performed best with only one. The optimal learning rate was similar for both antennas, with the MPA having the higher learning rate. The DNNs were able to predict $S_{11}$ values with an error tolerance of~$\pm$1dB for the MPA and LWA with a 84.17\% and 27.26\% accuracy respectively. These accuracies are not desirable, and might be an indicator that a DNN is too complex for this job.
+The Keras Tuner search for optimal hyperparameters of the DNN provided the results in Table~\ref{keras_best_params}. This was tested for both the MPA and the LWA. The MPA was found to work best with a smaller DNN consisting of two layers, where the LWA performed best with only one. The optimal learning rate was similar for both antennas, with the MPA having the higher learning rate. The DNNs were able to predict $S_{11}$ values with an error tolerance of~$\pm$1 dB for the MPA and LWA with a 84.17\% and 27.26\% accuracy respectively. These accuracies are not desirable, and might be an indicator that a DNN is too complex for this job.
 
 \begin{table}[h]
 \caption{Keras Tuner Best Hyperparameters}
@@ -326,14 +326,16 @@ Figure~\ref{dnn_loss_graph} shows how the DNN's loss decreased as the number of 
 \end{Figure}
 
 Each of the Scikit-learn regression models performed differently than one another. After performing a randomized search for the best hyperparameters for each type of model, the score of the best configuration of each model was reported alongside the $R^2$ and RMSE scores in Tables~\ref{comparing_sklearn_p} and~\ref{comparing_sklearn_lw}. The tables are sorted by best to worst performance by score, RMSE, and $R^2$. The goal is to have the accuracy and $R^2$ closest to one, and the RMSE closest to zero. It's clear by looking at the tables that XGBRegressor is the best performing model for both antennas. It has the highest accuracy and the lowest RMSE, which proves that its predictions had the least distance from the actual $S_{11}$ values. 
+    
+Learning curves were generated for both the MPA and LWA to demonstrate how the RMSE changed as the XGBRegressor ML model was trained on more data. These graphs show how the model gets better at making predictions as the number of instances used to train the model increases. Figure~\ref{learningcurve_mpa} shows the learning curve for the MPA, which is an ideal shape for a learning curve. The training set has relatively low error, and the validation set's error decreases over time. The two lines begin to converge, but still have a bit of gap between them, which means that the model would likely benefit from more training data. Figure~\ref{learningcurve_lwa} shows the same graph for the LWA, but the results are not as good. Just like for the MPA, the validation for the LWA decreases as more training data is added to the model, which means that the model is fitting to the data. However, because the validation and the training sets never converge and have a large distance between them, this model has high variance. This means that the model is being given too many features when compared to the amount of rows of training data available. This can be fixed by adding more training data, an idea which will be revisited in Section~\ref{sec:xai}.
 
 
-\begin{table}[h]
+\begin{table}[H]
     \caption{Scikit-learn Results for MPA}
     \begin{center}
-    \begin{tabular}{ |l|l|l|l| }
+    \begin{tabular}{ |l|p{1.7cm}|l|l| }
         \hline
-        Model Type & Accuracy within~$\pm$1dB & RMSE & $R^2$ \\ 
+        Model Type & Accuracy within~$\pm$1 dB & RMSE & $R^2$ \\ 
         \hline
         XGBRegressor & 0.9410 & 0.7330 & 0.9651 \\  
         \hline
@@ -349,15 +351,15 @@ Each of the Scikit-learn regression models performed differently than one anothe
         \hline
     \end{tabular}
     \end{center}
-    \label{comparing_sklearn_p}
-    \end{table}
-    
-    \begin{table}[h]
+\label{comparing_sklearn_p}
+\end{table}
+
+\begin{table}[H]
     \caption{Scikit-learn Results for LWA}
     \begin{center}
-    \begin{tabular}{ |l|l|l|l| }
+    \begin{tabular}{ |l|p{1.7cm}|l|l| }
         \hline
-        Model Type & Accuracy within~$\pm$1dB & RMSE & $R^2$ \\ 
+        Model Type & Accuracy within~$\pm$1 dB & RMSE & $R^2$ \\ 
         \hline
         XGBRegressor & 0.6271 & 2.686 & 0.7819 \\  
         \hline
@@ -373,10 +375,9 @@ Each of the Scikit-learn regression models performed differently than one anothe
         \hline
     \end{tabular}
     \end{center}
-    \label{comparing_sklearn_lw}
-    \end{table}
+\label{comparing_sklearn_lw}
+\end{table}
 
-Learning curves were generated for both the MPA and LWA to demonstrate how the RMSE changed as the XGBRegressor ML model was trained on more data. These graphs show how the model gets better at making predictions as the number of instances used to train the model increases. Figure~\ref{learningcurve_mpa} shows the learning curve for the MPA, which is an ideal shape for a learning curve. The training set has relatively low error, and the validation set's error decreases over time. The two lines begin to converge, but still have a bit of gap between them, which means that the model would likely benefit from more training data. Figure~\ref{learningcurve_lwa} shows the same graph for the LWA, but the results are not as good. Just like for the MPA, the validation for the LWA decreases as more training data is added to the model, which means that the model is fitting to the data. However, because the validation and the training sets never converge and have a large distance between them, this model has high variance. This means that the model is being given too many features when compared to the amount of rows of training data available. This can be fixed by adding more training data, an idea which will be revisited in Section~\ref{sec:xai}.
 
 \begin{Figure}
     \centering
@@ -395,7 +396,7 @@ Learning curves were generated for both the MPA and LWA to demonstrate how the R
 
 When comparing the TensorFlow and Scikit-learn libraries, the same random state was used when splitting the data into training and testing portions. This ensures that each library is given a fair chance with the same set of data and the data isn't being swayed unintentionally. The TensorFlow model had 500 epochs, but only used 35 of them for the MPA and 75 for the LWA due to the early stopping criteria that was set. 
 
-It's clear from Tables~\ref{comparing_libraries_p} and~\ref{comparing_libraries_lw} that Scikit-learn is the best choice of library for both of the antenna designs. The Scikit-learn model performed with better accuracy when predicting values with a tolerance of~$\pm$1dB, and it has a lower RMSE.
+It's clear from Tables~\ref{comparing_libraries_p} and~\ref{comparing_libraries_lw} that Scikit-learn is the best choice of library for both of the antenna designs. The Scikit-learn model performed with better accuracy when predicting values with a tolerance of~$\pm$1 dB, and it has a lower RMSE.
 
 \begin{table}[h]
 \caption{Comparing Libraries for MPA}
@@ -408,7 +409,7 @@ It's clear from Tables~\ref{comparing_libraries_p} and~\ref{comparing_libraries_
     \hline
     Predicting Time (s) & 2.91 & 3.69 \\
     \hline
-    $S_{11}$ Accuracy within~$\pm$1dB & 0.8417 & 0.9314 \\
+    $S_{11}$ Accuracy within~$\pm$1 dB & 0.8417 & 0.9314 \\
     \hline
     RMSE & 1.5050 & 0.7851 \\
     \hline
@@ -428,7 +429,7 @@ It's clear from Tables~\ref{comparing_libraries_p} and~\ref{comparing_libraries_
     \hline
     Predicting Time (ms) & 210.0 & 17.6 \\
     \hline
-    $S_{11}$ Accuracy within~$\pm$1dB & 0.2726 & 0.6731 \\
+    $S_{11}$ Accuracy within~$\pm$1 dB & 0.2726 & 0.6731 \\
     \hline
     RMSE & 14.237 & 2.686 \\
     \hline
@@ -481,7 +482,7 @@ For each antenna, the chosen model was given a set of six randomly selected geom
 \end{Figure}
 
 
-For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7GHz and 11GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values reach. 
+For the MPA, it's interesting to note how the prediction of the $S_{11}$ values of Geometry 2 was nearly identical to the simulated values. For Geometries 3, 4, and 6, both the predicted values and the simulated values had similar dips in the curves around 7 GHz and 11 GHz. However, the dips were shifted to slightly lower frequency ranges for the predicted values. Additionally, for all geometries tested, the predicted $S_{11}$ values appear to follow the same trend as the simulated values, but they never reach as far low as the simulated values reach. 
 
 \begin{Figure}
     \centering
