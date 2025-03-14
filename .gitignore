@@ -23,5 +23,7 @@ research/untitled_project/*
 *.h5
 *.pkl
 research/*.png
+research/*.svg
+/*.svg
 /*.png
 *.db
